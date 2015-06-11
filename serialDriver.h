@@ -12,6 +12,7 @@
 
 int writeString(char * text);
 int writeNumber(int value);
+char getCharacter(void);
 
 #endif	/* SERIALDRIVER_H */
 

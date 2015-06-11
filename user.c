@@ -17,9 +17,9 @@
 #include <stdbool.h>         /* For true/false definition                     */
 #include "user.h"            /* variables/params used by user.c               */
 
-//#define FP 40000000
+#define FP 40000000
 //#define FP 68750000
-#define FP 39613687
+//#define FP 39613687
 #define BAUDRATE 115200
 #define BRGVAL ((FP/BAUDRATE)/16)-1
 #define DELAY_105uS asm volatile ("REPEAT, #201"); Nop();// 105uS dela

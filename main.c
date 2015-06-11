@@ -36,6 +36,7 @@ Buffer BufferB_regs;
 int16_t main(void)
 {
 
+    
     /* Configure the oscillator for the device */
     ConfigureOscillator();
 
@@ -44,7 +45,6 @@ int16_t main(void)
     InitSerial();
 
     AD1CON1bits.ADON = 1;
-    T3CONbits.TON = 1;// Start Timer3
     
     while(1)
     {

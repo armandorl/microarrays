@@ -37,6 +37,11 @@ unsigned int CHANNELA1_OFFSET = 0;
 unsigned int CHANNELA2_OFFSET = 0;
 unsigned int CHANNELA3_OFFSET = 0;
 
+double CHANNELA0_GAIN = 1;
+double CHANNELA1_GAIN = 1;
+double CHANNELA2_GAIN = 1;
+double CHANNELA3_GAIN = 1;
+
 float EnergyCh0[CHANNEL_ENERGY_ARRAY] = {0,0,0,0,0,0,0,0,0,0};
 float EnergyCh1[CHANNEL_ENERGY_ARRAY] = {0,0,0,0,0,0,0,0,0,0};
 float EnergyCh2[CHANNEL_ENERGY_ARRAY] = {0,0,0,0,0,0,0,0,0,0};
@@ -197,7 +202,15 @@ void adcService(void)
         else if (initCounter > CALIBRATION_END)
         {
             StartFlag=1;
-            writeString("\n\rCalibration ended\n\r");
+            writeString("\n\rMicrophone 1 offset:\n\r");
+            writeNumber(CHANNELA0_OFFSET);
+            writeString("\n\rMicrophone 2 offset:\n\r");
+            writeNumber(CHANNELA1_OFFSET);
+            writeString("\n\rMicrophone 3 offset:\n\r");
+            writeNumber(CHANNELA2_OFFSET);
+            writeString("\n\rMicrophone 4 offset:\n\r");
+            writeNumber(CHANNELA3_OFFSET);
+            writeString("\n\rCalibration end\n\r");
         }else
         {
             initCounter++;
