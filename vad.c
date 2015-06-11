@@ -154,7 +154,7 @@ void adcService(void)
     static unsigned int initCounter = 0;
     static unsigned int StartFlag = 0;
     PORTBbits.RB15 ^= 1;
-
+    writeString(".");
     if(StartFlag == 1)
     {
         if (DmaBuffer == 1)

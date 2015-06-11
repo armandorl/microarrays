@@ -48,7 +48,7 @@ int16_t main(void)
     
     while(1)
     {
-        writeString("Hola Mundo!");
+//        writeString("Hola Mundo!");
     }
 
 }
