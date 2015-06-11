@@ -43,12 +43,6 @@ int16_t main(void)
     InitApp();
     InitSerial();
 
-    /* Delay required for initial calculation after power-on*/
-    int i=0;
-    for(;i<100;i++){
-        delay(30000);
-    }
-  
     AD1CON1bits.ADON = 1;
     T3CONbits.TON = 1;// Start Timer3
     

@@ -24,17 +24,18 @@
 void InitApp(void);         /* I/O and Peripheral Initialization */
 void InitDma(void);         /* DMA Initialization */
 void InitSerial(void);      /* UART initialization */
-float ProcessADCSamples(unsigned int *,unsigned int *, int, int);
+float ProcessADCSamples(unsigned int *, int, int);
 void CalculateAverage(unsigned int *, int);
 void delay(long);
+void adcService(void);
 void firFilter(float[],float[], float *);
 
 typedef struct tagBufferA{
     unsigned int channel[ADC_CHANNELS][BLOCKSIZE];
 } Buffer;
 
-extern Buffer BufferA_regs __attribute__((aligned(128)));
-extern Buffer BufferB_regs __attribute__((aligned(128)));
+extern Buffer BufferA_regs __attribute__((aligned(512)));
+extern Buffer BufferB_regs __attribute__((aligned(512)));
 extern long counter[ADC_CHANNELS];
 extern float filteredSignal[BLOCKSIZE];
 

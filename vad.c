@@ -21,12 +21,27 @@
 #include <dsp.h>
 
 #include "user.h"
+#include "serialDriver.h"
+
+#define CALIBRATION_START 100
+#define CALIBRATION_END   1000
 /*
  * 
  */
 
 long counter[ADC_CHANNELS]={0,0,0,0};
 float filteredSignal[BLOCKSIZE];
+
+unsigned int CHANNELA0_OFFSET = 0;
+unsigned int CHANNELA1_OFFSET = 0;
+unsigned int CHANNELA2_OFFSET = 0;
+unsigned int CHANNELA3_OFFSET = 0;
+
+float EnergyCh0[CHANNEL_ENERGY_ARRAY] = {0,0,0,0,0,0,0,0,0,0};
+float EnergyCh1[CHANNEL_ENERGY_ARRAY] = {0,0,0,0,0,0,0,0,0,0};
+float EnergyCh2[CHANNEL_ENERGY_ARRAY] = {0,0,0,0,0,0,0,0,0,0};
+float EnergyCh3[CHANNEL_ENERGY_ARRAY] = {0,0,0,0,0,0,0,0,0,0};
+unsigned int array_counter = 0;
 
 ////////////////////////////////////////
 // FIR Coeffecient Buffer
@@ -54,7 +69,7 @@ float coeffecients[N+1] = {
 };
 
 
-float ProcessADCSamples(unsigned int *bufA, unsigned int *bufB, int offset, int channel){
+float ProcessADCSamples(unsigned int *bufA, int offset, int channel){
 
     float energy_sum = 0;
     float zero_crossing = 0;
@@ -117,13 +132,82 @@ void CalculateAverage(unsigned int *bufA, int channel){
     a = a / BLOCKSIZE;
 
     if(channel == 0 ){
-        CHANNELA0_OFFSET = a;
+        CHANNELA0_OFFSET = (CHANNELA0_OFFSET + a) / 2;
     }else if(channel == 1){
-        CHANNELA1_OFFSET = a;
+        CHANNELA1_OFFSET = (CHANNELA1_OFFSET + a) / 2;
     }else if(channel == 2){
-        CHANNELA2_OFFSET = a;
+        CHANNELA2_OFFSET = (CHANNELA2_OFFSET + a) / 2;
     }else{
-        CHANNELA3_OFFSET = a;
+        CHANNELA3_OFFSET = (CHANNELA3_OFFSET + a) / 2;
     }
+
+}
+
+void adcService(void)
+{
+    static unsigned int DmaBuffer = 0;
+    static unsigned int initCounter = 0;
+    static unsigned int StartFlag = 0;
+    PORTBbits.RB15 ^= 1;
+
+    if(StartFlag == 1)
+    {
+        if (DmaBuffer == 1)
+        {
+
+            // Register B has just been written so it can be processed
+            EnergyCh0[array_counter] = ProcessADCSamples(&BufferB_regs.channel[0][0], CHANNELA0_OFFSET, 0);
+            EnergyCh1[array_counter] = ProcessADCSamples(&BufferB_regs.channel[1][0], CHANNELA1_OFFSET, 1);
+            EnergyCh2[array_counter] = ProcessADCSamples(&BufferB_regs.channel[2][0], CHANNELA2_OFFSET, 2);
+            EnergyCh3[array_counter] = ProcessADCSamples(&BufferB_regs.channel[3][0], CHANNELA3_OFFSET, 3);
+
+        }
+        else
+        {
+
+            EnergyCh0[array_counter] = ProcessADCSamples(&BufferA_regs.channel[0][0], CHANNELA0_OFFSET, 0);
+            EnergyCh1[array_counter] = ProcessADCSamples(&BufferA_regs.channel[1][0], CHANNELA1_OFFSET, 1);
+            EnergyCh2[array_counter] = ProcessADCSamples(&BufferA_regs.channel[2][0], CHANNELA2_OFFSET, 2);
+            EnergyCh3[array_counter] = ProcessADCSamples(&BufferA_regs.channel[3][0], CHANNELA3_OFFSET, 3);
+
+        }
+    }
+    else
+    {
+
+        if (initCounter > CALIBRATION_START && initCounter <= CALIBRATION_END)
+        {
+            if (DmaBuffer == 1)
+            {
+                CalculateAverage(&BufferB_regs.channel[0][0], 0);
+                CalculateAverage(&BufferB_regs.channel[1][0], 1);
+                CalculateAverage(&BufferB_regs.channel[2][0], 2);
+                CalculateAverage(&BufferB_regs.channel[3][0], 3);
+            }
+            else
+            {
+                CalculateAverage(&BufferA_regs.channel[0][0], 0);
+                CalculateAverage(&BufferA_regs.channel[1][0], 1);
+                CalculateAverage(&BufferA_regs.channel[2][0], 2);
+                CalculateAverage(&BufferA_regs.channel[3][0], 3);
+            }
+            writeString(".");
+            initCounter++;
+        }
+        else if (initCounter > CALIBRATION_END)
+        {
+            StartFlag=1;
+            writeString("\n\rCalibration ended\n\r");
+        }else
+        {
+            initCounter++;
+            if (initCounter == CALIBRATION_START )
+            {
+                writeString("Calibration started");
+            }
+        }
+        
+    }
+    DmaBuffer ^= 1;
 
 }
