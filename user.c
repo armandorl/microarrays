@@ -172,7 +172,8 @@ void InitDma(void){
     //DMA0CONbits.HALF = 1; // Interruption at half Enabled
     DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
     DMA0PAD = (volatile unsigned int)&ADC1BUF0; // Point DMA to ADC1BUF0
-    DMA0CNTbits.CNT = 4*(BLOCKSIZE * ADC_CHANNELS)-1; // 64 DMA request
+    // DMA0CNTbits.CNT = 4*(BLOCKSIZE * ADC_CHANNELS)-1; // 64 DMA request
+    DMA0CNTbits.CNT = (BLOCKSIZE * ADC_CHANNELS)-1; // 128 requests * 4 channesl
     DMA0REQ = 13; // Select ADC1 as DMA Request source
 
     IFS0bits.DMA0IF = 0; // Clear the DMA Interrupt Flag bit
