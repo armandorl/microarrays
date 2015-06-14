@@ -10,12 +10,13 @@
     #endif
 #endif
 
+#include "user.h"
 #include "serialDriver.h"
 
-int writeString(char * text)
+INT16 writeString(INT8 * text)
 {
-    int i = 0;
-    int ret = 0;
+    UINT8 i = 0;
+    UINT8 ret = 0;
     while( *(text+i) != 0 && ret == 0)
     {
         if (U1STAbits.TRMT) //1 = Transmit Shift Register is empty and transmit buffer is empty
@@ -35,11 +36,11 @@ int writeString(char * text)
     return ret;
 }
 
-int writeNumber(int value)
+INT16 writeNumber(INT16 value)
 {
-    int ret = 0;
-    char number[5] = {0};
-    char *printVal = &number[0];
+    UINT8 ret = 0;
+    INT8 number[5] = {0};
+    INT8 *printVal = &number[0];
     
     if(value < 0)
     {
@@ -62,6 +63,7 @@ int writeNumber(int value)
     else
     {
         writeString("Only values that are less than 10000 are supported.");
+        ret = 1;
     }
     
 
@@ -69,7 +71,7 @@ int writeNumber(int value)
 
 }
 
-char getCharacter(void)
+INT8 getCharacter(void)
 {
     char ReceivedChar;
 

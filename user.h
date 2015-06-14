@@ -18,32 +18,46 @@
 #define COUNTER_LOW_LIMIT         0
 #define CHANNEL_ENERGY_ARRAY      10
 
-/* TODO Application specific user parameters used in user.c may go here */
+/* Application specific user parameters used in user.c may go here */
+
+typedef char INT8;
+typedef int  INT16;
+typedef long INT32;
+
+typedef unsigned char UINT8;
+typedef unsigned int  UINT16;
+typedef unsigned long UINT32;
+
+typedef float FLOAT32;
+typedef long double FLOAT64;
 
 /******************************************************************************/
 /* User Function Prototypes                                                   */
 /******************************************************************************/
 
-/* TODO User level functions prototypes (i.e. InitApp) go here */
+/* User level functions prototypes (i.e. InitApp) go here */
 
 void InitApp(void);         /* I/O and Peripheral Initialization */
 void InitDma(void);         /* DMA Initialization */
 void InitSerial(void);      /* UART initialization */
-float ProcessADCSamples(unsigned int *, int);
-void CalculateAverage(unsigned int *, int);
-void delay(long);
+
+INT16 ProcessADCSamples(INT16 *signal, UINT8 channel);
+void CalculateAverage(INT16 *signal, UINT8 channel);
 void adcService(void);
-void firFilter(float[],float[], float *);
+
+// Assembly imported operations
+extern void ScaleSignal(INT16 * signal, INT16 offset);
+extern INT16 Calibrate(INT16 * signal);
 
 typedef struct tagBufferA{
-    unsigned int channel[ADC_CHANNELS][BLOCKSIZE];
+    INT16 channel[ADC_CHANNELS][BLOCKSIZE];
 } Buffer;
 
 extern Buffer BufferA_regs;
 extern Buffer BufferB_regs;
 
-extern unsigned int _PERSISTENT CHANNEL_OFFSET[ADC_CHANNELS];
-extern unsigned int _PERSISTENT CHANNEL_GAIN[ADC_CHANNELS];
-extern unsigned int _PERSISTENT CALIBRATION_AVAILABLE;
+extern INT16 _PERSISTENT CHANNEL_OFFSET[ADC_CHANNELS];
+extern INT16 _PERSISTENT CHANNEL_GAIN[ADC_CHANNELS];
+extern UINT8 _PERSISTENT CALIBRATION_AVAILABLE;
 
 #endif

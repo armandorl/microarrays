@@ -30,20 +30,21 @@
  * 
  */
 
-unsigned int EnergyCh[ADC_CHANNELS][CHANNEL_ENERGY_ARRAY] __attribute__((space(auto_psv))) = {{0}};
+UINT16 EnergyCh[ADC_CHANNELS][CHANNEL_ENERGY_ARRAY] __attribute__((space(auto_psv))) = {{0}};
 
 //__eds__ int __attribute__((space(xmemory),eds))
 //fractcomplex micSigCmpx[ADC_CHANNELS][FFT_BLOCK_LENGTH] __attribute__((space(auto_psv)));
 fractcomplex micSigCmpx[ADC_CHANNELS][FFT_BLOCK_LENGTH] _YDATA(FFT_BLOCK_LENGTH * 2 * 2);
 
-unsigned int _PERSISTENT CHANNEL_OFFSET[ADC_CHANNELS];
-unsigned int _PERSISTENT CHANNEL_GAIN[ADC_CHANNELS];
-unsigned int _PERSISTENT CALIBRATION_AVAILABLE;
+INT16 _PERSISTENT CHANNEL_OFFSET[ADC_CHANNELS];
+INT16 _PERSISTENT CHANNEL_GAIN[ADC_CHANNELS];
+UINT8 _PERSISTENT CALIBRATION_AVAILABLE;
 
-float ProcessADCSamples(unsigned int *bufA, int channel)
+INT16 ProcessADCSamples(INT16 *signal, UINT8 channel)
 {
 
     /* Remove the signal offset */
+    
     
 
     /* Detect if voice is available */
@@ -52,12 +53,10 @@ float ProcessADCSamples(unsigned int *bufA, int channel)
 
 }
 
-void CalculateAverage(unsigned int *bufA, int channel){
+void CalculateAverage(INT16 *signal, UINT8 channel)
+{
 
-    int i=0;
-    float a = 0;
-
-    if ( CALIBRATION_AVAILABLE == 0xADAD )
+    if ( CALIBRATION_AVAILABLE == 0xAD )
     {
         // Calibration is available so skip it
 
@@ -65,24 +64,18 @@ void CalculateAverage(unsigned int *bufA, int channel){
     else
     {
         // Calibration only required once
-        for( ; i < BLOCKSIZE; i++){
-            a = a + (float)*(bufA+i);
-        }
-        a = a / BLOCKSIZE;
-
+        CHANNEL_OFFSET[channel] = ( CHANNEL_OFFSET[channel] +
+                                    Calibrate(signal)          ) / 2;
       
-        CHANNEL_OFFSET[channel] = (CHANNEL_OFFSET[channel] + a) / 2;
-      
-
     }
 
 }
 
 void adcService(void)
 {
-    static unsigned int DmaBuffer = 0;
-    static unsigned int initCounter = 0;
-    static unsigned int StartFlag = 0;
+    static UINT8 DmaBuffer = 0;
+    static UINT16 initCounter = 0;
+    static UINT8 StartFlag = 0;
     PORTBbits.RB15 ^= 1;
     writeString(".");
     if(StartFlag == 1)
@@ -131,7 +124,7 @@ void adcService(void)
         }
         else if (initCounter > CALIBRATION_END)
         {
-            CALIBRATION_AVAILABLE = 0xADAD;
+            CALIBRATION_AVAILABLE = 0xAD;
             StartFlag=1;
             writeString("\n\rMicrophone 1 offset:\n\r");
             writeNumber(CHANNEL_OFFSET[0]);

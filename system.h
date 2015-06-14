@@ -2,7 +2,7 @@
 /* System Level #define Macros                                                */
 /******************************************************************************/
 
-/* TODO Define system operating frequency */
+/* Define system operating frequency */
 
 /* Microcontroller MIPs (FCY) */
 #define SYS_FREQ        165825000L

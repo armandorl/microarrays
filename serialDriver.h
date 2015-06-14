@@ -10,9 +10,9 @@
 
 #define MAX_UART_CHARS 128
 
-int writeString(char * text);
-int writeNumber(int value);
-char getCharacter(void);
+INT16 writeString(INT8 * text);
+INT16 writeNumber(INT16 value);
+INT8 getCharacter(void);
 
 #endif	/* SERIALDRIVER_H */
 
