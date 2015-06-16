@@ -23,19 +23,7 @@
 /******************************************************************************/
 
 void __attribute__((__interrupt__,no_auto_psv)) _AD1Interrupt(void){
-    
-    
-    // Restart timer
-    PORTBbits.RB14 ^= 1;
-    IFS0bits.AD1IF = 0; // ADC Interrupt flag
 
-}
-
-void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void){
-    // Switch between Primary and Secondary Ping-Pong buffers
-    // Period 3.06 ms with no calculations
-    // Period 28.12ms with calculations
-    adcService();
-    IFS0bits.DMA0IF = 0;// Clear the DMA5 Interrupt Flag
+    storeValues();
     
 }

@@ -17,12 +17,6 @@
 #include <stdbool.h>         /* For true/false definition                     */
 #include "user.h"            /* variables/params used by user.c               */
 
-#define FP 40000000
-//#define FP 68750000
-//#define FP 39613687
-#define BAUDRATE 115200
-#define BRGVAL ((FP/BAUDRATE)/16)-1
-#define DELAY_105uS asm volatile ("REPEAT, #201"); Nop();// 105uS dela
 
 /******************************************************************************/
 /* User Functions                                                             */
@@ -74,9 +68,13 @@ void InitApp(void)
     /* Setup analog functionality and port direction */
     AD1CON1bits.AD12B = 0; // 10-bit, 4 channel ADC
     AD1CON1bits.FORM = 0; // Form 0000 dddd dddd dddd Integer
-    AD1CON2bits.CHPS = 2; // Multichannel
+    AD1CON2bits.CHPS = 2; // Multichannel 4 channels
+//    AD1CON2bits.CHPS = 1; // Only CH0 and CH1
     AD1CON2bits.VCFG = 0;  // Vrefh = AVdd VrefL = AVss
     AD1CON2bits.CSCNA = 0; // Do not scan multiple inputs
+
+    AD1CON2bits.BUFM = 0; // Fill buffer from ADC0
+    AD1CON2bits.SMPI = 0; // Interrupt after 2 inputs acquired
 
     // Channel selection with Vrefl = AVss
     /*
@@ -94,16 +92,20 @@ void InitApp(void)
     // ADC Tad Time
     // TCY = 1/FCY = 25.2438 ns
 //    AD1CON3bits.ADRC = 0; // Internal timer off
+
+
     AD1CON3bits.ADRC = 0; // System clock
     //AD1CON3bits.ADCS = 2; // Freq / 3
-    AD1CON3bits.ADCS = 161; // Freq / 3
+    AD1CON3bits.ADCS = 15; // Freq / 3
     // TAD = TCY * (ADCS + 1)
-    // TAD = 25.2438 * 3 =  75.7 ns
-    // Tconv = 12 * TAD = 75.7 ns * 12 = 908.7 ns (1.1 Mhz)
+    // TAD = 25.2438 * 1 =  25.2438 ns
+    // TCONV = 12 * TAD = 25.2438 ns * 12 = 908.7 ns (1.1 Mhz)
     // ADCS = 164 = Tconv -> 50us
 
-    // Sample time -- not used if timer 3 in use
-    //AD1CON3bits.SAMC = 31; // 2.34 us
+    // TSIM = TSMP + (M ? TCONV)
+
+    // Sample time
+    AD1CON3bits.SAMC = 10;
 
     // Set as Inputs
     TRISAbits.TRISA0 = 1;
@@ -122,21 +124,11 @@ void InitApp(void)
     AD1CON1bits.SSRCG = 0; // Automatic
     AD1CON1bits.SSRC = 7; // Automatic conversion
     
-//    AD1CON1bits.SSRCG = 0; // Trigger by timer 3
-//    AD1CON1bits.SSRC = 2; // Trigger by timer 3
-//    AD1CON1bits.SSRC = 0; // Manual sampling
-//    TMR3 = 0x0000;
-//    PR3 = 1980;// Trigger ADC1 every 50us (TCY * PR3)
-    //TEST
-    //PR3 = 50;// Trigger ADC1 every 5usec (TCY * PR3)
-    IFS0bits.T3IF = 0;// Clear Timer3 interrupt
-    IEC0bits.T3IE = 0;// Disable Timer3 interrupt
-    
     // Enable simultaneous sampling
     AD1CON1bits.SIMSAM = 1;
 
     // DMA Usage
-    InitDma();
+    AD1CON4bits.ADDMAEN = 0; // DMA Disabled
 
     //IFS0bits.AD1IF = 1;
     IEC0bits.AD1IE = 1;
@@ -144,39 +136,4 @@ void InitApp(void)
 
     INTCON2bits.GIE = 1; // Enable global interrupts
     
-
-
-    /* Initialize peripherals */
-
-}
-
-
-void InitDma(void){
-
-    DMA0STAL = (unsigned int)&BufferA_regs;
-    DMA0STAH = 0x0000;
-    DMA0STBL = (unsigned int)&BufferB_regs;
-    DMA0STBH = 0x0000;
-    
-    DMA0CONbits.AMODE = 2; // Configure DMA for Peripheral Indirect Addressing
-    DMA0CONbits.SIZE = 0; // Word Size
-    DMA0CONbits.DIR = 0; //Read from peripheral
-    AD1CON1bits.ADDMABM = 0; // DMA buffers are built in scatter/gather mode
-
-    //Increments the DMA address after completion of every N+1 sample/conversion operation
-    AD1CON2bits.SMPI = 3; // Every 4 sample/conversion DMA address increases
-    AD1CON4bits.DMABL = BL_SQRT;  //2^6 words for each channel
-    AD1CON4bits.ADDMAEN = 1; // DMA Enabled
-
-    DMA0CONbits.HALF = 0; // Interruption at half CNT Disabled
-    //DMA0CONbits.HALF = 1; // Interruption at half Enabled
-    DMA0CONbits.MODE = 2; // Configure DMA for Continuous Ping-Pong mode
-    DMA0PAD = (volatile unsigned int)&ADC1BUF0; // Point DMA to ADC1BUF0
-    // DMA0CNTbits.CNT = 4*(BLOCKSIZE * ADC_CHANNELS)-1; // 64 DMA request
-    DMA0CNTbits.CNT = 2*(BLOCKSIZE * ADC_CHANNELS)-1; // 64 requests * 4 channesl
-    DMA0REQ = 13; // Select ADC1 as DMA Request source
-
-    IFS0bits.DMA0IF = 0; // Clear the DMA Interrupt Flag bit
-    IEC0bits.DMA0IE = 1; // Set the DMA Interrupt Enable bit
-    DMA0CONbits.CHEN = 1; // Enable DMA
 }

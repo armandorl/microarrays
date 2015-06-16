@@ -5,7 +5,7 @@
 /* Define system operating frequency */
 
 /* Microcontroller MIPs (FCY) */
-#define SYS_FREQ        165825000L
+#define SYS_FREQ        99000000L
 #define FCY             SYS_FREQ/2
 
 /******************************************************************************/

@@ -57,23 +57,14 @@ void ConfigureOscillator(void)
         // Watchdog disabled
         RCONbits.SWDTEN = 0;
 
-        // FRCin = 7.37 Mhz
-
-        // FRCDIV= 1
         CLKDIVbits.FRCDIV = 0;
 
         CLKDIVbits.DOZEN = 0;
         CLKDIVbits.DOZE = 0;
 
-        PLLFBDbits.PLLDIV = 41; // M = 43
-        CLKDIVbits.PLLPRE = 0; // N1=2
-        CLKDIVbits.PLLPOST = 0; // N2=2
-
-        // FOSC = FIN * (M/(N1*N2))
-        // FOSC = 7.37 * ((43)/(2*2) = 79.2275 Mhz
-        // FCY = Fosc/2 = 39.61375 Mhz
-        // TCY = 1/FCY = 25.2438 ns
-
+        PLLFBDbits.PLLDIV = 56;
+        CLKDIVbits.PLLPRE = 2;
+        CLKDIVbits.PLLPOST = 0;
         
         
 }

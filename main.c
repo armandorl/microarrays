@@ -24,16 +24,19 @@
 /******************************************************************************/
 /* Global Variable Declaration                                                */
 /******************************************************************************/
-Buffer BufferA_regs;
-Buffer BufferB_regs;
-/* i.e. uint16_t <variable_name>; */
+INT16 BufferA_regs[ADC_CHANNELS][BLOCKSIZE];
+INT16 BufferB_regs[ADC_CHANNELS][BLOCKSIZE];
+//INT16 complexSignal[BLOCKSIZE*2];
+fractcomplex micSigCmpx[2][BLOCKSIZE];
+
+INT8 startService = 0;
 
 /******************************************************************************/
 /* Main Program                                                               */
 /******************************************************************************/
 
 
-int16_t main(void)
+INT16 main(void)
 {
 
     
@@ -48,7 +51,12 @@ int16_t main(void)
     
     while(1)
     {
-//        writeString("Hola Mundo!");
+//        writeString("Hola Mundo!\n\r");
+        if (startService)
+        {
+            adcService();
+            startService = 0;
+        }
     }
 
 }

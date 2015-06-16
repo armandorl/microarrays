@@ -43,3 +43,12 @@ _ScaleSignal:
 ; END OF PROCEDURE: ScaleSignal
 ; -----------------------------------------------------------------------------
 
+    .text
+    .global _CalcTcy
+
+_CalcTcy:
+
+    REPEAT #30000
+    BTG  PORTB, #15  ; move the offset value to ACCB
+    RETURN
+

@@ -41,22 +41,21 @@
     .equ    FRACT_MODE,FRACT_MODE&0x3ff
 
 _Calibrate:
-    push	CORCON
-	MOV     #FRACT_MODE,W3
-    MOV     W3,CORCON
+;    push	CORCON
+;    MOV     #FRACT_MODE,W3
+;    MOV     W3,CORCON
 
+    MOV  W0, W4
     CLR A         ; Set the accumulator to 0
 
     ; repeat for all the array
-    REPEAT #63 ; BLOCKSIZE - 1 times
+    REPEAT #127 ; BLOCKSIZE - 1 times
     ADD [W0++],A
 
-    SAC A, W2 ; store scaled input
-    MOV #64, W3   ; W3 = 64 (BLOCKSIZE)
-    DIV.U W2, W3  ; W0 = W2 / W3
-
+    SAC A, #7, W0 ; store scaled input
+    
     ; Restore CORCON
-    pop	CORCON
+;    pop	CORCON
 
     RETURN
 

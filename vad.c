@@ -30,15 +30,49 @@
  * 
  */
 
-UINT16 EnergyCh[ADC_CHANNELS][CHANNEL_ENERGY_ARRAY] __attribute__((space(auto_psv))) = {{0}};
+
+INT8 activeBuffer = 0;
+UINT16 EnergyCh[ADC_CHANNELS][CHANNEL_ENERGY_ARRAY];
 
 //__eds__ int __attribute__((space(xmemory),eds))
 //fractcomplex micSigCmpx[ADC_CHANNELS][FFT_BLOCK_LENGTH] __attribute__((space(auto_psv)));
-fractcomplex micSigCmpx[ADC_CHANNELS][FFT_BLOCK_LENGTH] _YDATA(FFT_BLOCK_LENGTH * 2 * 2);
+//fractcomplex micSigCmpx[ADC_CHANNELS][FFT_BLOCK_LENGTH] _YDATA(ADC_CHANNELS*FFT_BLOCK_LENGTH);
 
-INT16 _PERSISTENT CHANNEL_OFFSET[ADC_CHANNELS];
+INT32 _PERSISTENT CHANNEL_OFFSET[ADC_CHANNELS];
 INT16 _PERSISTENT CHANNEL_GAIN[ADC_CHANNELS];
 UINT8 _PERSISTENT CALIBRATION_AVAILABLE;
+
+void storeValues(void)
+{
+    static UINT16 counter = 0;
+    PORTBbits.RB14 ^= 1;
+    
+    if(activeBuffer == 0)
+    {
+        BufferA_regs[0][counter] = ADC1BUF0;
+        BufferA_regs[1][counter] = ADC1BUF1;
+       
+    }
+    else
+    {
+        BufferB_regs[0][counter] = ADC1BUF0;
+        BufferB_regs[1][counter] = ADC1BUF1;
+        
+    }
+    
+    counter++;
+    if(counter == BLOCKSIZE)
+    {
+        activeBuffer ^= 1;
+        activeBuffer &= 0x1;
+        startService = 1;
+
+    }
+
+    counter = counter % BLOCKSIZE;
+
+    IFS0bits.AD1IF = 0; // ADC Interrupt flag
+}
 
 INT16 ProcessADCSamples(INT16 *signal, UINT8 channel)
 {
@@ -56,47 +90,39 @@ INT16 ProcessADCSamples(INT16 *signal, UINT8 channel)
 void CalculateAverage(INT16 *signal, UINT8 channel)
 {
 
-    if ( CALIBRATION_AVAILABLE == 0xAD )
-    {
-        // Calibration is available so skip it
-
-    }
-    else
-    {
         // Calibration only required once
-        CHANNEL_OFFSET[channel] = ( CHANNEL_OFFSET[channel] +
-                                    Calibrate(signal)          ) / 2;
+    CHANNEL_OFFSET[channel] = ( CHANNEL_OFFSET[channel] +
+                                Calibrate(signal) ) / 2;
       
-    }
+
 
 }
 
 void adcService(void)
 {
-    static UINT8 DmaBuffer = 0;
     static UINT16 initCounter = 0;
     static UINT8 StartFlag = 0;
     PORTBbits.RB15 ^= 1;
     writeString(".");
+    
     if(StartFlag == 1)
     {
-        if (DmaBuffer == 1)
+        if (activeBuffer == 1)
         {
 
             // Register B has just been written so it can be processed
-            EnergyCh[0][0] = ProcessADCSamples(&BufferB_regs.channel[0][0], 0);
-            EnergyCh[1][0] = ProcessADCSamples(&BufferB_regs.channel[1][0], 1);
-            EnergyCh[2][0] = ProcessADCSamples(&BufferB_regs.channel[2][0], 2);
-            EnergyCh[3][0] = ProcessADCSamples(&BufferB_regs.channel[3][0], 3);
+            writeString("A");
+            EnergyCh[0][0] = ProcessADCSamples(&BufferB_regs[0][0], 0);
+            EnergyCh[1][0] = ProcessADCSamples(&BufferB_regs[1][0], 1);
+            
 
         }
         else
         {
-
-            EnergyCh[0][0] = ProcessADCSamples(&BufferA_regs.channel[0][0], 0);
-            EnergyCh[1][0] = ProcessADCSamples(&BufferA_regs.channel[1][0], 1);
-            EnergyCh[2][0] = ProcessADCSamples(&BufferA_regs.channel[2][0], 2);
-            EnergyCh[3][0] = ProcessADCSamples(&BufferA_regs.channel[3][0], 3);
+            writeString("B");
+            EnergyCh[0][0] = ProcessADCSamples(&BufferA_regs[0][0], 0);
+            EnergyCh[1][0] = ProcessADCSamples(&BufferA_regs[1][0], 1);
+            
 
         }
     }
@@ -105,19 +131,17 @@ void adcService(void)
 
         if (initCounter > CALIBRATION_START && initCounter <= CALIBRATION_END)
         {
-            if (DmaBuffer == 1)
+            if (activeBuffer == 1)
             {
-                CalculateAverage(&BufferB_regs.channel[0][0], 0);
-                CalculateAverage(&BufferB_regs.channel[1][0], 1);
-                CalculateAverage(&BufferB_regs.channel[2][0], 2);
-                CalculateAverage(&BufferB_regs.channel[3][0], 3);
+                CalculateAverage(&BufferB_regs[0][0], 0);
+                CalculateAverage(&BufferB_regs[1][0], 1);
+                
             }
             else
             {
-                CalculateAverage(&BufferA_regs.channel[0][0], 0);
-                CalculateAverage(&BufferA_regs.channel[1][0], 1);
-                CalculateAverage(&BufferA_regs.channel[2][0], 2);
-                CalculateAverage(&BufferA_regs.channel[3][0], 3);
+                CalculateAverage(&BufferA_regs[0][0], 0);
+                CalculateAverage(&BufferA_regs[1][0], 1);
+                
             }
             writeString(".");
             initCounter++;
@@ -130,21 +154,18 @@ void adcService(void)
             writeNumber(CHANNEL_OFFSET[0]);
             writeString("\n\rMicrophone 2 offset:\n\r");
             writeNumber(CHANNEL_OFFSET[1]);
-            writeString("\n\rMicrophone 3 offset:\n\r");
-            writeNumber(CHANNEL_OFFSET[2]);
-            writeString("\n\rMicrophone 4 offset:\n\r");
-            writeNumber(CHANNEL_OFFSET[3]);
-            writeString("\n\rCalibration end\n\r");
+        
         }else
         {
             initCounter++;
             if (initCounter == CALIBRATION_START )
             {
+                CHANNEL_OFFSET[0] = 0x200;
+                CHANNEL_OFFSET[1] = 0x200;
                 writeString("Calibration started");
             }
         }
         
     }
-    DmaBuffer ^= 1;
 
 }
