@@ -26,25 +26,17 @@
 
 #define CALIBRATION_START 100  // Value * 100ms cycle
 #define CALIBRATION_END   1000
+
+UINT8 StartFlag = 0;
+
 /*
  * 
  */
 
-
-INT8 activeBuffer = 0;
-UINT16 EnergyCh[ADC_CHANNELS][CHANNEL_ENERGY_ARRAY];
-
-//__eds__ int __attribute__((space(xmemory),eds))
-//fractcomplex micSigCmpx[ADC_CHANNELS][FFT_BLOCK_LENGTH] __attribute__((space(auto_psv)));
-//fractcomplex micSigCmpx[ADC_CHANNELS][FFT_BLOCK_LENGTH] _YDATA(ADC_CHANNELS*FFT_BLOCK_LENGTH);
-
-INT32 _PERSISTENT CHANNEL_OFFSET[ADC_CHANNELS];
-INT16 _PERSISTENT CHANNEL_GAIN[ADC_CHANNELS];
-UINT8 _PERSISTENT CALIBRATION_AVAILABLE;
-
 void storeValues(void)
 {
     static UINT16 counter = 0;
+    INTCON2bits.GIE = 0; // Disable global interrupts
     PORTBbits.RB14 ^= 1;
     
     if(activeBuffer == 0)
@@ -71,6 +63,7 @@ void storeValues(void)
 
     counter = counter % BLOCKSIZE;
 
+    INTCON2bits.GIE = 1; // Enable global interrupts
     IFS0bits.AD1IF = 0; // ADC Interrupt flag
 }
 
@@ -91,81 +84,151 @@ void CalculateAverage(INT16 *signal, UINT8 channel)
 {
 
         // Calibration only required once
-    CHANNEL_OFFSET[channel] = ( CHANNEL_OFFSET[channel] +
-                                Calibrate(signal) ) / 2;
+//    CHANNEL_OFFSET[channel] = ( CHANNEL_OFFSET[channel] +
+//                                Calibrate(signal) ) / 2;
       
 
 
 }
 
-void adcService(void)
+
+INT8 calibration(void)
 {
     static UINT16 initCounter = 0;
-    static UINT8 StartFlag = 0;
+    INT16 InProgress = 1;
+    
+    if (initCounter > CALIBRATION_START && initCounter <= CALIBRATION_END)
+    {
+        if (activeBuffer == 0)
+        {
+            CalculateAverage((INT16*)&BufferB_regs[0][0], 0);
+            CalculateAverage((INT16*)&BufferB_regs[1][0], 1);
+
+        }
+        else
+        {
+            CalculateAverage((INT16*)&BufferA_regs[0][0], 0);
+            CalculateAverage((INT16*)&BufferA_regs[1][0], 1);
+
+        }
+        writeString(".");
+        initCounter++;
+    }
+    else if (StartFlag == 0 && initCounter > CALIBRATION_END)
+    {
+        StartFlag = 1;
+        writeString("\n\rMicrophone 1 offset:\n\r");
+        writeString("\n\rMicrophone 2 offset:\n\r");
+        InProgress = 0;
+
+    }
+    else if (StartFlag == 1)
+    {
+        // Skip operation
+    }
+    else
+    {
+        initCounter++;
+        if (initCounter == CALIBRATION_START )
+        {
+
+            writeString("Calibration started");
+        }
+    }
+
+    return InProgress;
+
+}
+void adcService(void)
+{
+    
+    
+    INT16 peakFrequencyBin0 = 0;           /* Declare post-FFT variables to compute the */
+    INT16 peakFrequencyBin1 = 0;           /* Declare post-FFT variables to compute the */
+    INT32 peakFrequency = 0;    /* frequency of the largest spectral component */
+    INT16 squaredOutput[BLOCKSIZE] = {0};
     PORTBbits.RB15 ^= 1;
-    writeString(".");
+//    writeString("x");
     
     if(StartFlag == 1)
     {
-        if (activeBuffer == 1)
+        if (activeBuffer == 0)
         {
-
+            writeString("\033[2J"); // Clear terminal
             // Register B has just been written so it can be processed
-            writeString("A");
-            EnergyCh[0][0] = ProcessADCSamples(&BufferB_regs[0][0], 0);
-            EnergyCh[1][0] = ProcessADCSamples(&BufferB_regs[1][0], 1);
+//            writeString("0:");
+//            ScaleSignal(&BufferB_regs[0][0]);
+//            writeString("1:");
+//            ScaleSignal(&BufferB_regs[1][0]);
+            writeString("A:");
+            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferB_regs[0][0],
+                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
+                         (int) __builtin_psvpage(&twiddleFactors[0]));
+            writeString("B:");
+            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferB_regs[0][0],
+                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
+                         (int) __builtin_psvpage(&twiddleFactors[0]));
+            writeString("C:");
+            
+            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferB_regs[0][0], &squaredOutput[0]);
+            writeString("D1:");
+            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferB_regs[1][0], &squaredOutput[0]);
+            writeString("D2:");
+            /* Find the frequency Bin ( = index into the SigCmpx[] array) that has the largest energy*/
+            /* i.e., the largest spectral component */
+            VectorMax(FFT_BLOCK_LENGTH/2, &BufferB_regs[0][0], &peakFrequencyBin0);
+            VectorMax(FFT_BLOCK_LENGTH/2, &BufferB_regs[1][0], &peakFrequencyBin1);
+
+            writeString("E:");
+            /* Compute the frequency (in Hz) of the largest spectral component */
+            peakFrequency = peakFrequencyBin0*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
+            writeNumber(peakFrequency);
+            writeString(":");
+            peakFrequency = peakFrequencyBin1*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
+            writeNumber(peakFrequency);
+            writeString("F:");
+            writeString("\n\r");
             
 
         }
         else
         {
-            writeString("B");
-            EnergyCh[0][0] = ProcessADCSamples(&BufferA_regs[0][0], 0);
-            EnergyCh[1][0] = ProcessADCSamples(&BufferA_regs[1][0], 1);
+//            writeString("\033[2J"); // Clear terminal
+//            writeString("0:");
+//            ScaleSignal(&BufferA_regs[0][0]);
+//            writeString("1:");
+//            ScaleSignal(&BufferA_regs[1][0]);
+            writeString("G:");
+            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferA_regs[0][0],
+                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
+                         (int) __builtin_psvpage(&twiddleFactors[0]));
+            writeString("H:");
+            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferA_regs[0][0],
+                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
+                         (int) __builtin_psvpage(&twiddleFactors[0]));
+
+            writeString("I:");
+
+            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferA_regs[0][0], &squaredOutput[0]);
+            writeString("J1:");
+            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferA_regs[1][0], &squaredOutput[0]);
+            writeString("J2:");
+            /* Find the frequency Bin ( = index into the SigCmpx[] array) that has the largest energy*/
+            /* i.e., the largest spectral component */
+            VectorMax(FFT_BLOCK_LENGTH/2, &BufferA_regs[0][0], &peakFrequencyBin0);
+            VectorMax(FFT_BLOCK_LENGTH/2, &BufferA_regs[1][0], &peakFrequencyBin1);
+
+            writeString("K:");
+            /* Compute the frequency (in Hz) of the largest spectral component */
+            peakFrequency = peakFrequencyBin0*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
+            writeNumber(peakFrequency);
+            writeString(":");
+            peakFrequency = peakFrequencyBin1*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
+            writeNumber(peakFrequency);
+            writeString("L:");
+            writeString("\n\r");
             
-
         }
     }
-    else
-    {
-
-        if (initCounter > CALIBRATION_START && initCounter <= CALIBRATION_END)
-        {
-            if (activeBuffer == 1)
-            {
-                CalculateAverage(&BufferB_regs[0][0], 0);
-                CalculateAverage(&BufferB_regs[1][0], 1);
-                
-            }
-            else
-            {
-                CalculateAverage(&BufferA_regs[0][0], 0);
-                CalculateAverage(&BufferA_regs[1][0], 1);
-                
-            }
-            writeString(".");
-            initCounter++;
-        }
-        else if (initCounter > CALIBRATION_END)
-        {
-            CALIBRATION_AVAILABLE = 0xAD;
-            StartFlag=1;
-            writeString("\n\rMicrophone 1 offset:\n\r");
-            writeNumber(CHANNEL_OFFSET[0]);
-            writeString("\n\rMicrophone 2 offset:\n\r");
-            writeNumber(CHANNEL_OFFSET[1]);
-        
-        }else
-        {
-            initCounter++;
-            if (initCounter == CALIBRATION_START )
-            {
-                CHANNEL_OFFSET[0] = 0x200;
-                CHANNEL_OFFSET[1] = 0x200;
-                writeString("Calibration started");
-            }
-        }
-        
-    }
-
+    
 }

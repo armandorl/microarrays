@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c twiddleFactors.c ScaleSignal.s Calibrate.s
+SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c twiddleFactors.c ScaleSignal.s Calibrate.s squareRealMagnitude.s
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/twiddleFactors.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/user.o.d ${OBJECTDIR}/vad.o.d ${OBJECTDIR}/serialDriver.o.d ${OBJECTDIR}/twiddleFactors.o.d ${OBJECTDIR}/ScaleSignal.o.d ${OBJECTDIR}/Calibrate.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/twiddleFactors.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o ${OBJECTDIR}/squareRealMagnitude.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/user.o.d ${OBJECTDIR}/vad.o.d ${OBJECTDIR}/serialDriver.o.d ${OBJECTDIR}/twiddleFactors.o.d ${OBJECTDIR}/ScaleSignal.o.d ${OBJECTDIR}/Calibrate.o.d ${OBJECTDIR}/squareRealMagnitude.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/twiddleFactors.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o
+OBJECTFILES=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/twiddleFactors.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o ${OBJECTDIR}/squareRealMagnitude.o
 
 # Source Files
-SOURCEFILES=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c twiddleFactors.c ScaleSignal.s Calibrate.s
+SOURCEFILES=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c twiddleFactors.c ScaleSignal.s Calibrate.s squareRealMagnitude.s
 
 
 CFLAGS=
@@ -215,30 +215,44 @@ ${OBJECTDIR}/ScaleSignal.o: ScaleSignal.s  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/ScaleSignal.o.d 
 	@${RM} ${OBJECTDIR}/ScaleSignal.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  ScaleSignal.s  -o ${OBJECTDIR}/ScaleSignal.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -Wa,-MD,"${OBJECTDIR}/ScaleSignal.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
+	${MP_CC} $(MP_EXTRA_AS_PRE)  ScaleSignal.s  -o ${OBJECTDIR}/ScaleSignal.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/ScaleSignal.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
 	@${FIXDEPS} "${OBJECTDIR}/ScaleSignal.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
 ${OBJECTDIR}/Calibrate.o: Calibrate.s  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/Calibrate.o.d 
 	@${RM} ${OBJECTDIR}/Calibrate.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
+	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
 	@${FIXDEPS} "${OBJECTDIR}/Calibrate.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
+	
+${OBJECTDIR}/squareRealMagnitude.o: squareRealMagnitude.s  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/squareRealMagnitude.o.d 
+	@${RM} ${OBJECTDIR}/squareRealMagnitude.o 
+	${MP_CC} $(MP_EXTRA_AS_PRE)  squareRealMagnitude.s  -o ${OBJECTDIR}/squareRealMagnitude.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/squareRealMagnitude.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
+	@${FIXDEPS} "${OBJECTDIR}/squareRealMagnitude.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
 else
 ${OBJECTDIR}/ScaleSignal.o: ScaleSignal.s  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/ScaleSignal.o.d 
 	@${RM} ${OBJECTDIR}/ScaleSignal.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  ScaleSignal.s  -o ${OBJECTDIR}/ScaleSignal.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -Wa,-MD,"${OBJECTDIR}/ScaleSignal.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
+	${MP_CC} $(MP_EXTRA_AS_PRE)  ScaleSignal.s  -o ${OBJECTDIR}/ScaleSignal.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/ScaleSignal.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
 	@${FIXDEPS} "${OBJECTDIR}/ScaleSignal.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
 ${OBJECTDIR}/Calibrate.o: Calibrate.s  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
 	@${RM} ${OBJECTDIR}/Calibrate.o.d 
 	@${RM} ${OBJECTDIR}/Calibrate.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
+	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
 	@${FIXDEPS} "${OBJECTDIR}/Calibrate.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
+	
+${OBJECTDIR}/squareRealMagnitude.o: squareRealMagnitude.s  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR} 
+	@${RM} ${OBJECTDIR}/squareRealMagnitude.o.d 
+	@${RM} ${OBJECTDIR}/squareRealMagnitude.o 
+	${MP_CC} $(MP_EXTRA_AS_PRE)  squareRealMagnitude.s  -o ${OBJECTDIR}/squareRealMagnitude.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/squareRealMagnitude.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
+	@${FIXDEPS} "${OBJECTDIR}/squareRealMagnitude.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
 endif
 
@@ -253,12 +267,12 @@ endif
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../../../../Microchip/xc16/v1.11/lib/libdsp-elf.a  
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\..\..\Microchip\xc16\v1.11\lib\libdsp-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library=dsp,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem$(MP_EXTRA_LD_POST) 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\..\..\Microchip\xc16\v1.11\lib\libdsp-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,$(MP_LINKER_FILE_OPTION),--heap=128,--stack=32,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library=dsp,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem$(MP_EXTRA_LD_POST) 
 	
 else
 dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../../../../Microchip/xc16/v1.11/lib/libdsp-elf.a 
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\..\..\Microchip\xc16\v1.11\lib\libdsp-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library=dsp,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem$(MP_EXTRA_LD_POST) 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\..\..\Microchip\xc16\v1.11\lib\libdsp-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--heap=128,--stack=32,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library=dsp,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem$(MP_EXTRA_LD_POST) 
 	${MP_CC_DIR}\\xc16-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} -a  -omf=elf 
 	
 endif

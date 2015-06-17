@@ -21,7 +21,6 @@
 ;
 ;  Parameters:
 ;   in/out - W0 points to the beginning of the data block
-;   in     - W1 contains the offset value
 ;
 ; -----------------------------------------------------------------------------
     .text
@@ -29,14 +28,15 @@
 
 _ScaleSignal:
 
+    MOV #512, W1
     LAC  W1, B  ; move the offset value to ACCB
     ; scale the entire data block before processing
-    DO #63, SCALE ; BLOCKSIZE - 1 times
+    DO #255, SCALE ; BLOCKSIZE - 1 times
     LAC [W0], A ; move the next data sample to ACCA
     SUB A       ; remove offset from signal ACCA = ACCA - ACCB
-    SFTAC A, #6 ; shift ACCA by 6 bits for 10-bit ADC
     SCALE:
-    SAC A, [W0++] ; store scaled input (overwrite original)
+    SAC A, #-5, [W0++] ; store scaled input (overwrite original)
+    RETURN
     
 
 ; -----------------------------------------------------------------------------

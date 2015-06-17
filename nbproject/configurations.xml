@@ -9,7 +9,6 @@
       <itemPath>serialDriver.h</itemPath>
       <itemPath>fft.h</itemPath>
       <itemPath>dsp.h</itemPath>
-      <itemPath>../../../../Microchip/xc16/v1.11/src/inc/dspcommon.inc</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -37,6 +36,7 @@
       <itemPath>twiddleFactors.c</itemPath>
       <itemPath>ScaleSignal.s</itemPath>
       <itemPath>Calibrate.s</itemPath>
+      <itemPath>squareRealMagnitude.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -125,7 +125,8 @@
       <C30-AS>
         <property key="assembler-symbols" value=""/>
         <property key="expand-macros" value="false"/>
-        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-assembler"
+                  value="C:\Microchip\xc16\v1.11\src\inc"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
@@ -156,7 +157,7 @@
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
-        <property key="heap-size" value=""/>
+        <property key="heap-size" value="128"/>
         <property key="input-libraries" value="dsp"/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
@@ -173,7 +174,7 @@
         <property key="secure-flash" value="no_flash"/>
         <property key="secure-ram" value="no_ram"/>
         <property key="secure-write-protect" value="no_write_protect"/>
-        <property key="stack-size" value="16"/>
+        <property key="stack-size" value="32"/>
         <property key="symbol-stripping" value=""/>
         <property key="trace-symbols" value=""/>
         <property key="warn-section-align" value="false"/>

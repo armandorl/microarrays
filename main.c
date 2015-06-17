@@ -20,16 +20,16 @@
 #include "system.h"        /* System funct/params, like osc/peripheral config */
 #include "user.h"          /* User funct/params, such as InitApp              */
 #include "serialDriver.h"
+#include "dsp.h"
 
 /******************************************************************************/
 /* Global Variable Declaration                                                */
 /******************************************************************************/
 INT16 BufferA_regs[ADC_CHANNELS][BLOCKSIZE];
 INT16 BufferB_regs[ADC_CHANNELS][BLOCKSIZE];
-//INT16 complexSignal[BLOCKSIZE*2];
-fractcomplex micSigCmpx[2][BLOCKSIZE];
 
 INT8 startService = 0;
+INT8 activeBuffer = 0;
 
 /******************************************************************************/
 /* Main Program                                                               */
@@ -47,13 +47,17 @@ INT16 main(void)
     InitApp();
     InitSerial();
 
+    /* We need to do this only once at start-up */
     AD1CON1bits.ADON = 1;
+
+    
     
     while(1)
     {
 //        writeString("Hola Mundo!\n\r");
-        if (startService)
+        if (startService == 1)
         {
+            calibration();
             adcService();
             startService = 0;
         }
