@@ -41,19 +41,23 @@ void storeValues(void)
     
     if(activeBuffer == 0)
     {
-        BufferA_regs[0][counter] = ADC1BUF0;
-        BufferA_regs[1][counter] = ADC1BUF1;
+        BufferA0_regs[counter].real = ADC1BUF0;
+        BufferA1_regs[counter].real = ADC1BUF1;
+        BufferA2_regs[counter].real = ADC1BUF2;
+        BufferA3_regs[counter].real = ADC1BUF3;
        
     }
     else
     {
-        BufferB_regs[0][counter] = ADC1BUF0;
-        BufferB_regs[1][counter] = ADC1BUF1;
+        BufferB0_regs[counter].real = ADC1BUF0;
+        BufferB1_regs[counter].real = ADC1BUF1;
+        BufferB2_regs[counter].real = ADC1BUF2;
+        BufferB3_regs[counter].real = ADC1BUF3;
         
     }
     
     counter++;
-    if(counter == BLOCKSIZE)
+    if(counter == FFT_BLOCK_LENGTH)
     {
         activeBuffer ^= 1;
         activeBuffer &= 0x1;
@@ -61,7 +65,7 @@ void storeValues(void)
 
     }
 
-    counter = counter % BLOCKSIZE;
+    counter = counter % FFT_BLOCK_LENGTH;
 
     INTCON2bits.GIE = 1; // Enable global interrupts
     IFS0bits.AD1IF = 0; // ADC Interrupt flag
@@ -101,14 +105,14 @@ INT8 calibration(void)
     {
         if (activeBuffer == 0)
         {
-            CalculateAverage((INT16*)&BufferB_regs[0][0], 0);
-            CalculateAverage((INT16*)&BufferB_regs[1][0], 1);
+            CalculateAverage((INT16*)&BufferB0_regs[0], 0);
+            CalculateAverage((INT16*)&BufferB1_regs[0], 1);
 
         }
         else
         {
-            CalculateAverage((INT16*)&BufferA_regs[0][0], 0);
-            CalculateAverage((INT16*)&BufferA_regs[1][0], 1);
+            CalculateAverage((INT16*)&BufferA0_regs[0], 0);
+            CalculateAverage((INT16*)&BufferA1_regs[0], 1);
 
         }
         writeString(".");
@@ -139,14 +143,16 @@ INT8 calibration(void)
     return InProgress;
 
 }
+
+/* Variables for adcService */
+INT16 peakFrequencyBin0 = 0;           /* Declare post-FFT variables to compute the */
+INT16 peakFrequencyBin1 = 0;           /* Declare post-FFT variables to compute the */
+
 void adcService(void)
 {
     
-    
-    INT16 peakFrequencyBin0 = 0;           /* Declare post-FFT variables to compute the */
-    INT16 peakFrequencyBin1 = 0;           /* Declare post-FFT variables to compute the */
     INT32 peakFrequency = 0;    /* frequency of the largest spectral component */
-    INT16 squaredOutput[BLOCKSIZE] = {0};
+    INT16 squaredOutput[FFT_BLOCK_LENGTH] = {0};
     PORTBbits.RB15 ^= 1;
 //    writeString("x");
     
@@ -154,30 +160,28 @@ void adcService(void)
     {
         if (activeBuffer == 0)
         {
-            writeString("\033[2J"); // Clear terminal
+           // writeString("\033[2J"); // Clear terminal
             // Register B has just been written so it can be processed
 //            writeString("0:");
 //            ScaleSignal(&BufferB_regs[0][0]);
 //            writeString("1:");
 //            ScaleSignal(&BufferB_regs[1][0]);
             writeString("A:");
-            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferB_regs[0][0],
-                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
-                         (int) __builtin_psvpage(&twiddleFactors[0]));
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB0_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
             writeString("B:");
-            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferB_regs[0][0],
-                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
-                         (int) __builtin_psvpage(&twiddleFactors[0]));
-            writeString("C:");
-            
-            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferB_regs[0][0], &squaredOutput[0]);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB1_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+            writeString("C1:");
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB0_regs[0], &squaredOutput[0]);
+            writeString("C2:");
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
             writeString("D1:");
-            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferB_regs[1][0], &squaredOutput[0]);
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB1_regs[0], &squaredOutput[0]);
             writeString("D2:");
             /* Find the frequency Bin ( = index into the SigCmpx[] array) that has the largest energy*/
             /* i.e., the largest spectral component */
-            VectorMax(FFT_BLOCK_LENGTH/2, &BufferB_regs[0][0], &peakFrequencyBin0);
-            VectorMax(FFT_BLOCK_LENGTH/2, &BufferB_regs[1][0], &peakFrequencyBin1);
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
 
             writeString("E:");
             /* Compute the frequency (in Hz) of the largest spectral component */
@@ -199,24 +203,23 @@ void adcService(void)
 //            writeString("1:");
 //            ScaleSignal(&BufferA_regs[1][0]);
             writeString("G:");
-            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferA_regs[0][0],
-                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
-                         (int) __builtin_psvpage(&twiddleFactors[0]));
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA0_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
             writeString("H:");
-            FFTReal32bIP(LOG2_BLOCK_LENGTH, FFT_BLOCK_LENGTH, &BufferA_regs[0][0],
-                         (int *) __builtin_psvoffset(&twiddleFactors[0]),
-                         (int) __builtin_psvpage(&twiddleFactors[0]));
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA1_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
 
             writeString("I:");
 
-            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferA_regs[0][0], &squaredOutput[0]);
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB0_regs[0], &squaredOutput[0]);
             writeString("J1:");
-            SquareMagnitude(FFT_BLOCK_LENGTH, &BufferA_regs[1][0], &squaredOutput[0]);
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
             writeString("J2:");
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB1_regs[0], &squaredOutput[0]);
+            writeString("J3:");
             /* Find the frequency Bin ( = index into the SigCmpx[] array) that has the largest energy*/
             /* i.e., the largest spectral component */
-            VectorMax(FFT_BLOCK_LENGTH/2, &BufferA_regs[0][0], &peakFrequencyBin0);
-            VectorMax(FFT_BLOCK_LENGTH/2, &BufferA_regs[1][0], &peakFrequencyBin1);
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
 
             writeString("K:");
             /* Compute the frequency (in Hz) of the largest spectral component */

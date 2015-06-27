@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c twiddleFactors.c ScaleSignal.s Calibrate.s squareRealMagnitude.s
+SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c ScaleSignal.s Calibrate.s
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/twiddleFactors.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o ${OBJECTDIR}/squareRealMagnitude.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/user.o.d ${OBJECTDIR}/vad.o.d ${OBJECTDIR}/serialDriver.o.d ${OBJECTDIR}/twiddleFactors.o.d ${OBJECTDIR}/ScaleSignal.o.d ${OBJECTDIR}/Calibrate.o.d ${OBJECTDIR}/squareRealMagnitude.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/user.o.d ${OBJECTDIR}/vad.o.d ${OBJECTDIR}/serialDriver.o.d ${OBJECTDIR}/ScaleSignal.o.d ${OBJECTDIR}/Calibrate.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/twiddleFactors.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o ${OBJECTDIR}/squareRealMagnitude.o
+OBJECTFILES=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o
 
 # Source Files
-SOURCEFILES=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c twiddleFactors.c ScaleSignal.s Calibrate.s squareRealMagnitude.s
+SOURCEFILES=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c ScaleSignal.s Calibrate.s
 
 
 CFLAGS=
@@ -74,8 +74,8 @@ FIXDEPS=fixDeps
 .build-conf:  ${BUILD_SUBPROJECTS}
 	${MAKE} ${MAKE_OPTIONS} -f nbproject/Makefile-C30_dsPIC33FJ256GP710A.mk dist/${CND_CONF}/${IMAGE_TYPE}/dspic33e_Microarrays.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
-MP_PROCESSOR_OPTION=33EP32MC202
-MP_LINKER_FILE_OPTION=,--script=p33EP32MC202.gld
+MP_PROCESSOR_OPTION=33EP256GP502
+MP_LINKER_FILE_OPTION=,--script=p33EP256GP502.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
@@ -135,13 +135,6 @@ ${OBJECTDIR}/serialDriver.o: serialDriver.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  serialDriver.c  -o ${OBJECTDIR}/serialDriver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/serialDriver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/serialDriver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/twiddleFactors.o: twiddleFactors.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR} 
-	@${RM} ${OBJECTDIR}/twiddleFactors.o.d 
-	@${RM} ${OBJECTDIR}/twiddleFactors.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  twiddleFactors.c  -o ${OBJECTDIR}/twiddleFactors.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/twiddleFactors.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -msmart-io=1 -Wall -msfr-warn=off
-	@${FIXDEPS} "${OBJECTDIR}/twiddleFactors.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
 else
 ${OBJECTDIR}/configuration_bits.o: configuration_bits.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
@@ -199,13 +192,6 @@ ${OBJECTDIR}/serialDriver.o: serialDriver.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  serialDriver.c  -o ${OBJECTDIR}/serialDriver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/serialDriver.o.d"      -g -omf=elf -O0 -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/serialDriver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/twiddleFactors.o: twiddleFactors.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR} 
-	@${RM} ${OBJECTDIR}/twiddleFactors.o.d 
-	@${RM} ${OBJECTDIR}/twiddleFactors.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  twiddleFactors.c  -o ${OBJECTDIR}/twiddleFactors.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/twiddleFactors.o.d"      -g -omf=elf -O0 -msmart-io=1 -Wall -msfr-warn=off
-	@${FIXDEPS} "${OBJECTDIR}/twiddleFactors.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
 endif
 
 # ------------------------------------------------------------------------------------
@@ -225,13 +211,6 @@ ${OBJECTDIR}/Calibrate.o: Calibrate.s  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
 	@${FIXDEPS} "${OBJECTDIR}/Calibrate.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/squareRealMagnitude.o: squareRealMagnitude.s  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR} 
-	@${RM} ${OBJECTDIR}/squareRealMagnitude.o.d 
-	@${RM} ${OBJECTDIR}/squareRealMagnitude.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  squareRealMagnitude.s  -o ${OBJECTDIR}/squareRealMagnitude.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/squareRealMagnitude.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/squareRealMagnitude.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
-	
 else
 ${OBJECTDIR}/ScaleSignal.o: ScaleSignal.s  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR} 
@@ -246,13 +225,6 @@ ${OBJECTDIR}/Calibrate.o: Calibrate.s  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/Calibrate.o 
 	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
 	@${FIXDEPS} "${OBJECTDIR}/Calibrate.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
-	
-${OBJECTDIR}/squareRealMagnitude.o: squareRealMagnitude.s  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR} 
-	@${RM} ${OBJECTDIR}/squareRealMagnitude.o.d 
-	@${RM} ${OBJECTDIR}/squareRealMagnitude.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  squareRealMagnitude.s  -o ${OBJECTDIR}/squareRealMagnitude.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/squareRealMagnitude.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/squareRealMagnitude.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
 	
 endif
 

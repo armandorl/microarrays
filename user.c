@@ -33,7 +33,7 @@ void InitSerial(void)
     ANSELBbits.ANSB8 = 0;
 
     /* Port mapping */
-    RPINR38bits.DTCMP1R = 0x27;  /* 010 0111 RP39/RB7 to UART1 Rx */
+    RPINR18bits.U1RXR = 0x27; /* 010 0111 RP39/RB7 to UART1 Rx */
     RPOR3bits.RP40R = 1; /* RP40/RB8 tied to UART1 Transmit */
 
     // Configure oscillator as needed
