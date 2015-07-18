@@ -24,6 +24,8 @@
 
 void __attribute__((__interrupt__,no_auto_psv)) _AD1Interrupt(void){
 
+    PORTBbits.RB14 ^= 1;
+    IFS0bits.AD1IF = 0; // ADC Interrupt flag
     storeValues();
     
 }

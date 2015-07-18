@@ -18,7 +18,7 @@
 #define CHANNEL_ENERGY_ARRAY      10
 
 
-#define FP 39875000
+#define FP  39875000
 #define BAUDRATE 115200
 #define BRGVAL ((FP/BAUDRATE)/16)-1
 #define DELAY_105uS asm volatile ("REPEAT, #201"); Nop();// 105uS dela
@@ -47,13 +47,13 @@ void InitDma(void);         /* DMA Initialization */
 void InitSerial(void);      /* UART initialization */
 
 INT16 ProcessADCSamples(INT16 *signal, UINT8 channel);
-void CalculateAverage(INT16 *signal, UINT8 channel);
-INT8 calibration(void);
+FLOAT32 CalculateAverage(fractcomplex *signal);
+void calibration(void);
 void adcService(void);
 void storeValues(void);
 
 // Assembly imported operations
-extern void ScaleSignal(INT16 * signal);
+extern void ScaleSignal(fractcomplex * signal);
 extern INT32 Calibrate(INT16 * signal);
 extern void CalcTcy(void);
 

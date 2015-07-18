@@ -39,7 +39,7 @@ INT16 writeString(INT8 * text)
 INT16 writeNumber(INT16 value)
 {
     UINT8 ret = 0;
-    INT8 number[5] = {0};
+    INT8 number[10] = {0};
     INT8 *printVal = &number[0];
     
     if(value < 0)
@@ -48,21 +48,25 @@ INT16 writeNumber(INT16 value)
         value = value * -1;
     }
 
-    if( value < 10000)
+    if( value < 1000000)
     {
-        *printVal = '0' + (value / 1000);
+        *printVal = '0' + (value / 100000);
+        value = value % 100000;
+        *(printVal+1) = '0' + (value / 10000);
+        value = value % 10000;
+        *(printVal+2) = '0' + (value / 1000);
         value = value % 1000;
-        *(printVal+1) = '0' + (value / 100);
+        *(printVal+3) = '0' + (value / 100);
         value = value % 100;
-        *(printVal+2) = '0' + (value / 10);
+        *(printVal+4) = '0' + (value / 10);
         value = value % 10;
-        *(printVal+3) = '0' + value;
+        *(printVal+5) = '0' + value;
         
         writeString(printVal);
     }
     else
     {
-        writeString("Only values that are less than 10000 are supported.");
+        writeString("Only values that are less than 1000000 are supported.");
         ret = 1;
     }
     
@@ -71,9 +75,48 @@ INT16 writeNumber(INT16 value)
 
 }
 
+INT16 writeRoundFloatNum(FLOAT32 value)
+{
+    UINT8 ret = 0;
+    INT8 number[10] = {0};
+    INT8 *printVal = &number[0];
+
+    if(value < 0)
+    {
+        writeString("-");
+        value = value * -1;
+    }
+
+    if( value < 1000000)
+    {
+        *printVal = '0' + (value / 100000);
+        value = (INT32)value % 100000;
+        *(printVal+1) = '0' + (value / 10000);
+        value = (INT32)value % 10000;
+        *(printVal+2) = '0' + (value / 1000);
+        value = (INT32)value % 1000;
+        *(printVal+3) = '0' + (value / 100);
+        value = (INT32)value % 100;
+        *(printVal+4) = '0' + (value / 10);
+        value = (INT32)value % 10;
+        *(printVal+5) = '0' + value;
+
+        writeString(printVal);
+    }
+    else
+    {
+        writeString("Only values that are less than 1000000 are supported.");
+        ret = 1;
+    }
+
+
+    return ret;
+
+}
+
 INT8 getCharacter(void)
 {
-    char ReceivedChar;
+    char ReceivedChar = 0;
 
     /* Check for receive errors */
     if(U1STAbits.FERR == 1)
@@ -91,12 +134,10 @@ INT8 getCharacter(void)
     /* Get the data */
     if(U1STAbits.URXDA == 1)
     {
-        ReceivedChar = U1RXREG;
+        while(U1STAbits.URXDA == 1){
+            ReceivedChar = U1RXREG;
+        }
     }
-
-    writeString("Rxdata=");
-    writeNumber(ReceivedChar);
-    writeString("\n\r");
     
     return ReceivedChar;
     

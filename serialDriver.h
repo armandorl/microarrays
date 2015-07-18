@@ -12,6 +12,7 @@
 
 INT16 writeString(INT8 * text);
 INT16 writeNumber(INT16 value);
+INT16 writeRoundFloatNum(FLOAT32 value);
 INT8 getCharacter(void);
 
 #endif	/* SERIALDRIVER_H */

@@ -31,7 +31,8 @@ _ScaleSignal:
     MOV #512, W1
     LAC  W1, B  ; move the offset value to ACCB
     ; scale the entire data block before processing
-    DO #255, SCALE ; BLOCKSIZE - 1 times
+    DO #511, SCALE ; (BLOCKSIZE*2) - 1 times
+    CLR A
     LAC [W0], A ; move the next data sample to ACCA
     SUB A       ; remove offset from signal ACCA = ACCA - ACCB
     SCALE:

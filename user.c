@@ -54,7 +54,7 @@ void InitSerial(void)
 
     /* Wait at least 105 microseconds (1/9600) before sending first char */
     DELAY_105uS
-    U1TXREG = 'a';// Transmit one characterwhile(1){}
+//    U1TXREG = 'a';// Transmit one characterwhile(1){}
 
 }
 
@@ -62,6 +62,8 @@ void InitSerial(void)
 void InitApp(void)
 {
     /* TODO Initialize User Ports/Peripherals/Project here */
+    AD1CON1bits.ADON = 0;
+
     TRISBbits.TRISB14 = 0;
     TRISBbits.TRISB15 = 0;
 
@@ -74,8 +76,16 @@ void InitApp(void)
     AD1CON2bits.CSCNA = 0; // Do not scan multiple inputs
 
     AD1CON2bits.BUFM = 0; // Fill buffer from ADC0
-    AD1CON2bits.SMPI = 0; // Interrupt after 2 inputs acquired
+    AD1CON2bits.SMPI = 0; // Interrupt after 1st conversion
 
+        // Control ADC
+    AD1CON1bits.ASAM = 1; // Automatic sampling on
+    AD1CON1bits.SSRCG = 0; // Automatic
+    AD1CON1bits.SSRC = 7; // Automatic conversion
+
+    // Enable simultaneous sampling
+    AD1CON1bits.SIMSAM = 1;
+    
     // Channel selection with Vrefl = AVss
     /*
      * CH0 = AN3
@@ -96,7 +106,7 @@ void InitApp(void)
 
     AD1CON3bits.ADRC = 0; // System clock
     //AD1CON3bits.ADCS = 2; // Freq / 3
-    AD1CON3bits.ADCS = 15; // Freq / 3
+    AD1CON3bits.ADCS = 49; // Freq / 3
     // TAD = TCY * (ADCS + 1)
     // TAD = 25.2438 * 1 =  25.2438 ns
     // TCONV = 12 * TAD = 25.2438 ns * 12 = 908.7 ns (1.1 Mhz)
@@ -105,7 +115,7 @@ void InitApp(void)
     // TSIM = TSMP + (M ? TCONV)
 
     // Sample time
-    AD1CON3bits.SAMC = 10;
+    AD1CON3bits.SAMC = 31;
 
     // Set as Inputs
     TRISAbits.TRISA0 = 1;
@@ -118,14 +128,6 @@ void InitApp(void)
     ANSELAbits.ANSA1 = 1;
     ANSELBbits.ANSB0 = 1;
     ANSELBbits.ANSB1 = 1;
-    
-    // Control ADC
-    AD1CON1bits.ASAM = 1; // Automatic sampling on
-    AD1CON1bits.SSRCG = 0; // Automatic
-    AD1CON1bits.SSRC = 7; // Automatic conversion
-    
-    // Enable simultaneous sampling
-    AD1CON1bits.SIMSAM = 1;
 
     // DMA Usage
     AD1CON4bits.ADDMAEN = 0; // DMA Disabled
