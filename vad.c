@@ -294,25 +294,25 @@ void adcService(void)
     if (activeBuffer == 0)
     {
 
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB0_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplex(LOG2_BLOCK_LENGTH, &BufferB2_regs[0].real, &BufferB0_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
             
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB1_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB1_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB2_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB2_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB3_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB3_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB0_regs[0], &squaredOutput[0]);
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB0_regs[0].real, &squaredOutput[0]);
 
             squaredOutput[0] = 0; // Remove low frequencies
 
             VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
             
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB1_regs[0], &squaredOutput[0]);
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB1_regs[0].real, &squaredOutput[0]);
 
             squaredOutput[0] = 0; // Remove low frequencies
 
@@ -321,36 +321,36 @@ void adcService(void)
             VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
 //            /* Compute the frequency (in Hz) of the largest spectral component */
             peakFrequency = FFT_BINS[peakFrequencyBin0];
-//            writeString("B:");
-//            writeNumber(peakFrequency);
-//            writeString(" ");
-//            peakFrequency = FFT_BINS[peakFrequencyBin1];
-//            writeNumber(peakFrequency);
-//            writeString("\n\r");
+            writeString("B:");
+            writeNumber(peakFrequency);
+            writeString(" ");
+            peakFrequency = FFT_BINS[peakFrequencyBin1];
+            writeNumber(peakFrequency);
+            writeString("\n\r");
 
     }
     else
     {
 
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA0_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA0_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA1_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA1_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
             
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA2_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA2_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA3_regs[0],
-                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA3_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferA0_regs[0], &squaredOutput[0]);
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferA0_regs[0].real, &squaredOutput[0]);
 
             squaredOutput[0] = 0; // Remove low frequencies
 
             VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferA1_regs[0], &squaredOutput[0]);
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferA1_regs[0].real, &squaredOutput[0]);
 
             squaredOutput[0] = 0; // Remove low frequencies
 
@@ -360,12 +360,12 @@ void adcService(void)
 
 //            /* Compute the frequency (in Hz) of the largest spectral component */
             peakFrequency = FFT_BINS[peakFrequencyBin0];
-//            writeString("A:");
-//            writeNumber(peakFrequency);
-//            writeString(" ");
-//            peakFrequency = FFT_BINS[peakFrequencyBin1];
-//            writeNumber(peakFrequency);
-//            writeString("\n\r");
+            writeString("A:");
+            writeNumber(peakFrequency);
+            writeString(" ");
+            peakFrequency = FFT_BINS[peakFrequencyBin1];
+            writeNumber(peakFrequency);
+            writeString("\n\r");
 
     }
     
