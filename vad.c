@@ -38,9 +38,12 @@ UINT8 StartFlag = 0;
 void storeValues(void)
 {
     static UINT16 counter = 0;
-    static FLOAT32 FrameEnergy = 0;
-    FLOAT32 tempVal = 0;
-    INTCON2bits.GIE = 0; // Disable global interrupts
+    static UINT32 FrameEnergy = 0;
+    static UINT32 DynamicThreshold = 0;
+    static UINT8 firstTime = 1;
+    INT16 tempVal = 0;
+    INT16 tempSubVal = 0;
+//    INTCON2bits.GIE = 0; // Disable global interrupts
     
     
     if(activeBuffer == 0)
@@ -55,17 +58,21 @@ void storeValues(void)
         BufferA2_regs[counter].imag = 0;
         BufferA3_regs[counter].imag = 0;
 
-        tempVal = (((float)BufferA0_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
-        FrameEnergy += tempVal;
-        tempVal = (((float)BufferA1_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
-        FrameEnergy += tempVal;
-        tempVal = (((float)BufferA2_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
-        FrameEnergy += tempVal;
-        tempVal = (((float)BufferA3_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
+        tempSubVal = BufferA0_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferA0_regs[counter].real;
+        tempSubVal = BufferA1_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferA1_regs[counter].real;
+        tempSubVal = BufferA2_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferA2_regs[counter].real;
+        tempSubVal = BufferA3_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferA3_regs[counter].real;
+        tempVal = tempVal >> 2; // Divided by 4
+
+        BufferA0_regs[counter].real = (BufferA0_regs[counter].real - HALF_ADC_OFFSET) << 6;
+        BufferA1_regs[counter].real = (BufferA1_regs[counter].real - HALF_ADC_OFFSET) << 6;
+        BufferA2_regs[counter].real = (BufferA2_regs[counter].real - HALF_ADC_OFFSET) << 6;
+        BufferA3_regs[counter].real = (BufferA3_regs[counter].real - HALF_ADC_OFFSET) << 6;
+
         FrameEnergy += tempVal;
 
         
@@ -82,17 +89,21 @@ void storeValues(void)
         BufferB2_regs[counter].imag = 0;
         BufferB3_regs[counter].imag = 0;
 
-        tempVal = (((float)BufferB0_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
-        FrameEnergy += tempVal;
-        tempVal = (((float)BufferB1_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
-        FrameEnergy += tempVal;
-        tempVal = (((float)BufferB2_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
-        FrameEnergy += tempVal;
-        tempVal = (((float)BufferB3_regs[counter].real / 1024) * 2) - 1;
-        if(tempVal < 0) tempVal = tempVal * -1;
+        tempSubVal = BufferB0_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferB0_regs[counter].real;
+        tempSubVal = BufferB1_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferB1_regs[counter].real;
+        tempSubVal = BufferB2_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferB2_regs[counter].real;
+        tempSubVal = BufferB3_regs[counter].real - HALF_ADC_OFFSET;
+        tempVal = (tempSubVal < 0)? HALF_ADC_OFFSET - tempSubVal : BufferB3_regs[counter].real;
+        tempVal = tempVal >> 2; // Divided by 4
+
+        BufferB0_regs[counter].real = (BufferB0_regs[counter].real - HALF_ADC_OFFSET) << 6;
+        BufferB1_regs[counter].real = (BufferB1_regs[counter].real - HALF_ADC_OFFSET) << 6;
+        BufferB2_regs[counter].real = (BufferB2_regs[counter].real - HALF_ADC_OFFSET) << 6;
+        BufferB3_regs[counter].real = (BufferB3_regs[counter].real - HALF_ADC_OFFSET) << 6;
+
         FrameEnergy += tempVal;
         
     }
@@ -102,19 +113,40 @@ void storeValues(void)
     {
         activeBuffer ^= 1;
         activeBuffer &= 0x1;
-//        writeString("Energy for Frame:");
+
+//        if (firstTime)
+//        {
+//            DynamicThreshold = FrameEnergy + 2000;
+//            firstTime = 0;
+//        }
+//        else
+//        {
+//            DynamicThreshold = DynamicThreshold + (( (FrameEnergy + 1000) - DynamicThreshold ) >> 5);
+//            if (DynamicThreshold > 50000)
+//                DynamicThreshold = 50000;
+//            if (DynamicThreshold < 33000)
+//                DynamicThreshold = 33000;
+//        }
+
+//        FrameEnergy = FrameEnergy >> LOG2_BLOCK_LENGTH; // Divide by BLOCK_LENGTH
+//        writeString("NRGY:");
 //        writeRoundFloatNum(FrameEnergy);
+//        writeString(" TH:");
+//        writeRoundFloatNum(DynamicThreshold);
 //        writeString("\n\r");
-        if(FrameEnergy > 60)
+
+//        if(FrameEnergy > DynamicThreshold)
+        if(FrameEnergy > 35500 )
         {
-            startService = 1;
-            StartFlag = 0;
+            PORTBbits.RB15 = 1;
+            adcService();
+            
         }
         else
         {
             // Do Calibration only in frames with no voice
-            StartFlag = 1;
-            startService = 0;
+            PORTBbits.RB15 = 0;
+            
         }
 
         FrameEnergy = 0;
@@ -123,7 +155,7 @@ void storeValues(void)
 
     counter = counter % FFT_BLOCK_LENGTH;
 
-    INTCON2bits.GIE = 1; // Enable global interrupts
+//    INTCON2bits.GIE = 1; // Enable global interrupts
     IFS0bits.AD1IF = 0; // ADC Interrupt flag
     PORTBbits.RB14 ^= 1;
 }
@@ -251,87 +283,91 @@ INT16 peakFrequencyBin1 = 0;           /* Declare post-FFT variables to compute 
 void adcService(void)
 {
     
-//    INT32 peakFrequency = 0;    /* frequency of the largest spectral component */
-//    INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
-    PORTBbits.RB15 ^= 1;
+    INT32 peakFrequency = 0;    /* frequency of the largest spectral component */
+    INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
+    fractcomplex results[FFT_BLOCK_LENGTH];
+//    PORTBbits.RB15 ^= 1;
 //    writeString("x");
+
+    TwidFactorInit (LOG2_BLOCK_LENGTH, &twiddleFactors[0], 0);
     
-    if(StartFlag == 1)
+    if (activeBuffer == 0)
     {
-        if (activeBuffer == 0)
-        {
-           // writeString("\033[2J"); // Clear terminal
-            // Register B has just been written so it can be processed
-            //ScaleSignal(&BufferB0_regs[0]);
+
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB0_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
             
-//            writeString("1:");
-////            ScaleSignal(&BufferB1_regs[0]);
-//            writeString("A:");
-//            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB0_regs[0],
-//                         &twiddleFactors[0], COEFFS_IN_DATA);
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB1_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB2_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB3_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB0_regs[0], &squaredOutput[0]);
+
+            squaredOutput[0] = 0; // Remove low frequencies
+
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
+            
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB1_regs[0], &squaredOutput[0]);
+
+            squaredOutput[0] = 0; // Remove low frequencies
+
+        /* Find the frequency Bin ( = index into the SigCmpx[] array) that has the largest energy*/
+        /* i.e., the largest spectral component */
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
+//            /* Compute the frequency (in Hz) of the largest spectral component */
+            peakFrequency = FFT_BINS[peakFrequencyBin0];
 //            writeString("B:");
-//            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferB1_regs[0],
-//                         &twiddleFactors[0], COEFFS_IN_DATA);
-//            writeString("C1:");
-//            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB0_regs[0], &squaredOutput[0]);
-//            writeString("C2:");
-//            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
-//            writeString("D1:");
-//            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB1_regs[0], &squaredOutput[0]);
-//            writeString("D2:");
+//            writeNumber(peakFrequency);
+//            writeString(" ");
+//            peakFrequency = FFT_BINS[peakFrequencyBin1];
+//            writeNumber(peakFrequency);
+//            writeString("\n\r");
+
+    }
+    else
+    {
+
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA0_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA1_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+            
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA2_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+
+            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA3_regs[0],
+                         &twiddleFactors[0], COEFFS_IN_DATA);
+
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferA0_regs[0], &squaredOutput[0]);
+
+            squaredOutput[0] = 0; // Remove low frequencies
+
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
+
+            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferA1_regs[0], &squaredOutput[0]);
+
+            squaredOutput[0] = 0; // Remove low frequencies
+
             /* Find the frequency Bin ( = index into the SigCmpx[] array) that has the largest energy*/
             /* i.e., the largest spectral component */
-//            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
-//
-//            writeString("E:");
-//            /* Compute the frequency (in Hz) of the largest spectral component */
-//            peakFrequency = peakFrequencyBin0*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
-//            writeNumber(peakFrequency);
-//            writeString(":");
-//            peakFrequency = peakFrequencyBin1*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
-//            writeNumber(peakFrequency);
-//            writeString("F:");
-//            writeString("\n\r");
-            
+            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
 
-        }
-        else
-        {
-////            writeString("\033[2J"); // Clear terminal
-//            writeString("0:");
-////            ScaleSignal(&BufferA0_regs[0]);
-//            writeString("1:");
-////            ScaleSignal(&BufferA1_regs[0]);
-//            writeString("G:");
-//            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA0_regs[0],
-//                         &twiddleFactors[0], COEFFS_IN_DATA);
-//            writeString("H:");
-//            FFTComplexIP(LOG2_BLOCK_LENGTH, &BufferA1_regs[0],
-//                         &twiddleFactors[0], COEFFS_IN_DATA);
-//
-//            writeString("I:");
-//
-//            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB0_regs[0], &squaredOutput[0]);
-//            writeString("J1:");
-//            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin0);
-//            writeString("J2:");
-//            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &BufferB1_regs[0], &squaredOutput[0]);
-//            writeString("J3:");
-//            /* Find the frequency Bin ( = index into the SigCmpx[] array) that has the largest energy*/
-//            /* i.e., the largest spectral component */
-//            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
-//
-//            writeString("K:");
 //            /* Compute the frequency (in Hz) of the largest spectral component */
-//            peakFrequency = peakFrequencyBin0*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
+            peakFrequency = FFT_BINS[peakFrequencyBin0];
+//            writeString("A:");
 //            writeNumber(peakFrequency);
-//            writeString(":");
-//            peakFrequency = peakFrequencyBin1*(SAMPLING_RATE/FFT_BLOCK_LENGTH);
+//            writeString(" ");
+//            peakFrequency = FFT_BINS[peakFrequencyBin1];
 //            writeNumber(peakFrequency);
-//            writeString("L:");
 //            writeString("\n\r");
-            
-        }
+
     }
+    
     
 }

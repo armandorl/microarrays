@@ -106,7 +106,7 @@ void InitApp(void)
 
     AD1CON3bits.ADRC = 0; // System clock
     //AD1CON3bits.ADCS = 2; // Freq / 3
-    AD1CON3bits.ADCS = 49; // Freq / 3
+    AD1CON3bits.ADCS = 22; // Freq / 3
     // TAD = TCY * (ADCS + 1)
     // TAD = 25.2438 * 1 =  25.2438 ns
     // TCONV = 12 * TAD = 25.2438 ns * 12 = 908.7 ns (1.1 Mhz)
@@ -115,7 +115,7 @@ void InitApp(void)
     // TSIM = TSMP + (M ? TCONV)
 
     // Sample time
-    AD1CON3bits.SAMC = 31;
+    AD1CON3bits.SAMC = 30;
 
     // Set as Inputs
     TRISAbits.TRISA0 = 1;

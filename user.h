@@ -90,6 +90,7 @@ extern fractcomplex BufferB3_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory
 extern fractcomplex twiddleFactors[FFT_BLOCK_LENGTH/2] 	/* Declare Twiddle Factor array in X-space*/
 __attribute__ ((section (".xbss, bss, xmemory"), aligned (FFT_BLOCK_LENGTH*2)));
 
+extern const INT16 FFT_BINS[FFT_BLOCK_LENGTH];
 
 extern INT16 peakFrequencyBin0;           /* Declare post-FFT variables to compute the */
 extern INT16 peakFrequencyBin1;           /* Declare post-FFT variables to compute the */

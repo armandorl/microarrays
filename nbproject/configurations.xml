@@ -35,6 +35,7 @@
       <itemPath>serialDriver.c</itemPath>
       <itemPath>ScaleSignal.s</itemPath>
       <itemPath>Calibrate.s</itemPath>
+      <itemPath>fft_binaries.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

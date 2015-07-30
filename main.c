@@ -66,15 +66,15 @@ INT16 main(void)
     AD1CON1bits.ADON = 1;
 
     calibration();
-    TwidFactorInit (LOG2_BLOCK_LENGTH, &twiddleFactors[0], 0);	/* We need to do this only once at start-up */
+    
     while(1)
     {
 
-        if (startService == 1)
-        {
-            adcService();
-            startService = 0;
-        }
+//        if (startService == 1)
+//        {
+//            adcService();
+//            startService = 0;
+//        }
     }
 
 }
