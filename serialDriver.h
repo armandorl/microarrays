@@ -11,7 +11,7 @@
 #define MAX_UART_CHARS 128
 
 INT16 writeString(INT8 * text);
-INT16 writeNumber(INT16 value);
+INT16 writeNumber(INT32 value);
 INT16 writeRoundFloatNum(FLOAT32 value);
 INT8 getCharacter(void);
 

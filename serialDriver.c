@@ -36,7 +36,7 @@ INT16 writeString(INT8 * text)
     return ret;
 }
 
-INT16 writeNumber(INT16 value)
+INT16 writeNumber(INT32 value)
 {
     UINT8 ret = 0;
     INT8 number[10] = {0};
