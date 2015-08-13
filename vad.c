@@ -305,177 +305,97 @@ void adcService(void)
     INT16 peakFrequencyBin = 0;
     INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
 
+    INT32 i = 0;
+    
     TwidFactorInit (LOG2_BLOCK_LENGTH, &twiddleFactors[0], 0);
     
     if (activeBuffer == 0)
     {
 
          // Buffer 0
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferB0_regs[0].real,
-                         &twiddleFactors[0].real, COEFFS_IN_DATA);
-            
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
-
-            squaredOutput[0] = 0; // Remove low frequencies
-
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
-
-            writeString("B0:");
-            writeNumber(FrameEnergyChan[0]);
-            writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
-
-            // Buffer 1
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferB1_regs[0].real,
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0].real, &BufferB0_regs[0].real,
                          &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
-            
-            squaredOutput[0] = 0; // Remove low frequencies
-
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
-
-            writeString(" B1:");
-            writeNumber(FrameEnergyChan[1]);
-            writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
-
-            // Buffer 2
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferB2_regs[0].real,
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results2[0].real, &BufferB1_regs[0].real,
                          &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
-
-            squaredOutput[0] = 0; // Remove low frequencies
-
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
-
-            writeString(" B2:");
-            writeNumber(FrameEnergyChan[2]);
-            writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
-
-            // Buffer 3
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferB3_regs[0].real,
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results3[0].real, &BufferB2_regs[0].real,
                          &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results4[0].real, &BufferB3_regs[0].real,
+                         &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            squaredOutput[0] = 0; // Remove low frequencies
+            // Calculate Complex conjugates
+            for(i=0; i < FFT_BLOCK_LENGTH; i++)
+            {
+                Buffer_results2[i].imag = (~(Buffer_results2[i].imag))+1;
+                Buffer_results3[i].imag = (~(Buffer_results3[i].imag))+1;
+                Buffer_results4[i].imag = (~(Buffer_results4[i].imag))+1;
+            }
 
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
+            VectorMultiply(FFT_BLOCK_LENGTH, &Buffer_results2[0].real, &Buffer_results1[0].real, &Buffer_results2[0].real);
+            VectorMultiply(FFT_BLOCK_LENGTH, &Buffer_results3[0].real, &Buffer_results1[0].real, &Buffer_results3[0].real);
+            VectorMultiply(FFT_BLOCK_LENGTH, &Buffer_results4[0].real, &Buffer_results1[0].real, &Buffer_results4[0].real);
 
-            writeString(" B3:");
-            writeNumber(FrameEnergyChan[3]);
+            IFFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0].real, &Buffer_results2[0].real, &twiddleFactors[0].real, COEFFS_IN_DATA);
+            IFFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results2[0].real, &Buffer_results3[0].real, &twiddleFactors[0].real, COEFFS_IN_DATA);
+            IFFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results3[0].real, &Buffer_results4[0].real, &twiddleFactors[0].real, COEFFS_IN_DATA);
+
+            writeString(" B:");
+            VectorMax(FFT_BLOCK_LENGTH, &Buffer_results1[0].real, &peakFrequencyBin);
+            writeNumber(peakFrequencyBin);
             writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
+            VectorMax(FFT_BLOCK_LENGTH, &Buffer_results2[0].real, &peakFrequencyBin);
+            writeNumber(peakFrequencyBin);
             writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
+            VectorMax(FFT_BLOCK_LENGTH, &Buffer_results3[0].real, &peakFrequencyBin);
+            writeNumber(peakFrequencyBin);
             writeString("\n\r");
+
 
     }
     else
     {
 
          // Buffer 0
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferA0_regs[0].real,
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0].real, &BufferA0_regs[0].real,
                          &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
-
-            squaredOutput[0] = 0; // Remove low frequencies
-
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
-
-            writeString("A0:");
-            writeNumber(FrameEnergyChan[0]);
-            writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
-
-            // Buffer 1
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferA1_regs[0].real,
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results2[0].real, &BufferA1_regs[0].real,
                          &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
-
-            squaredOutput[0] = 0; // Remove low frequencies
-
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
-
-            writeString(" A1:");
-            writeNumber(FrameEnergyChan[1]);
-            writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
-
-            // Buffer 2
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferA2_regs[0].real,
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results3[0].real, &BufferA2_regs[0].real,
                          &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
-
-            squaredOutput[0] = 0; // Remove low frequencies
-
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
-
-            writeString(" A2:");
-            writeNumber(FrameEnergyChan[2]);
-            writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
-
-            // Buffer 3
-            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results[0].real, &BufferA3_regs[0].real,
+            FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results4[0].real, &BufferA3_regs[0].real,
                          &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results[0].real, &squaredOutput[0]);
+            // Calculate Complex conjugates
+            for(i=0; i < FFT_BLOCK_LENGTH; i++)
+            {
+                Buffer_results2[i].imag = (~(Buffer_results2[i].imag))+1;
+                Buffer_results3[i].imag = (~(Buffer_results2[i].imag))+1;
+                Buffer_results4[i].imag = (~(Buffer_results2[i].imag))+1;
+            }
 
-            squaredOutput[0] = 0; // Remove low frequencies
+            VectorMultiply(FFT_BLOCK_LENGTH, &Buffer_results2[0].real, &Buffer_results1[0].real, &Buffer_results2[0].real);
+            VectorMultiply(FFT_BLOCK_LENGTH, &Buffer_results3[0].real, &Buffer_results1[0].real, &Buffer_results3[0].real);
+            VectorMultiply(FFT_BLOCK_LENGTH, &Buffer_results4[0].real, &Buffer_results1[0].real, &Buffer_results4[0].real);
 
-            VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
+            IFFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0].real, &Buffer_results2[0].real, &twiddleFactors[0].real, COEFFS_IN_DATA);
+            IFFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results2[0].real, &Buffer_results3[0].real, &twiddleFactors[0].real, COEFFS_IN_DATA);
+            IFFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results3[0].real, &Buffer_results4[0].real, &twiddleFactors[0].real, COEFFS_IN_DATA);
 
-            writeString(" A3:");
-            writeNumber(FrameEnergyChan[3]);
+            writeString(" A:");
+            VectorMax(FFT_BLOCK_LENGTH, &Buffer_results1[0].real, &peakFrequencyBin);
+            writeNumber(peakFrequencyBin);
             writeString(" ");
-            peakFrequency = FFT_BINS[peakFrequencyBin];
-            writeNumber(peakFrequency);
+            VectorMax(FFT_BLOCK_LENGTH, &Buffer_results2[0].real, &peakFrequencyBin);
+            writeNumber(peakFrequencyBin);
             writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].real);
-            writeString(" ");
-            writeNumber(Buffer_results[peakFrequencyBin].imag);
+            VectorMax(FFT_BLOCK_LENGTH, &Buffer_results3[0].real, &peakFrequencyBin);
+            writeNumber(peakFrequencyBin);
             writeString("\n\r");
-
     }
     
     
