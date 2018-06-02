@@ -23,9 +23,41 @@
 /******************************************************************************/
 
 void __attribute__((__interrupt__,no_auto_psv)) _AD1Interrupt(void){
-
-    PORTBbits.RB14 ^= 1;
     IFS0bits.AD1IF = 0; // ADC Interrupt flag
-    storeValues();
+    /*storeValues();*/
     
+}
+
+
+void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void){
+    PORTBbits.RB14 ^= 1;
+    IFS0bits.DMA0IF = 0;  // Clear the DMA Interrupt flag bit
+    
+    if(((volatile unsigned int)DMAPPS) & 0x01)
+    {
+        PORTBbits.RB15 ^= 1;
+        
+        InitADCSignals(&BufferA);
+
+        /* When buffer B is selected process Buffer A */
+        ProcessADCSamples(&Buffer0_regs[0], &Buffer1_regs[0]);
+        ProcessADCSamples(&Buffer0_regs[0], &Buffer2_regs[0]);
+        ProcessADCSamples(&Buffer0_regs[0], &Buffer3_regs[0]);
+
+        PORTBbits.RB15 ^= 1;
+    }
+    else
+    {
+        PORTBbits.RB15 ^= 1;
+        /* When buffer A is selected process Buffer B */
+        InitADCSignals(&BufferB);
+
+        /* When buffer B is selected process Buffer A */
+        ProcessADCSamples(&Buffer0_regs[0], &Buffer1_regs[0]);
+        ProcessADCSamples(&Buffer0_regs[0], &Buffer2_regs[0]);
+        ProcessADCSamples(&Buffer0_regs[0], &Buffer3_regs[0]);
+
+        PORTBbits.RB15 ^= 1;
+        
+    }
 }

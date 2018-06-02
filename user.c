@@ -17,7 +17,6 @@
 #include <stdbool.h>         /* For true/false definition                     */
 #include "user.h"            /* variables/params used by user.c               */
 
-
 /******************************************************************************/
 /* User Functions                                                             */
 /******************************************************************************/
@@ -69,14 +68,13 @@ void InitApp(void)
 
     /* Setup analog functionality and port direction */
     AD1CON1bits.AD12B = 0; // 10-bit, 4 channel ADC
-    AD1CON1bits.FORM = 0; // Form 0000 dddd dddd dddd Integer
+    AD1CON1bits.FORM = 0b11; // 11 = Signed fractional (DOUT = sddd dddd dd00 0000, where s = sign, d = data)
     AD1CON2bits.CHPS = 2; // Multichannel 4 channels
 //    AD1CON2bits.CHPS = 1; // Only CH0 and CH1
     AD1CON2bits.VCFG = 0;  // Vrefh = AVdd VrefL = AVss
     AD1CON2bits.CSCNA = 0; // Do not scan multiple inputs
 
-    AD1CON2bits.BUFM = 0; // Fill buffer from ADC0
-    AD1CON2bits.SMPI = 0; // Interrupt after 1st conversion
+    AD1CON2bits.BUFM = 1; // Fill buffer first half and then second half
 
         // Control ADC
     AD1CON1bits.ASAM = 1; // Automatic sampling on
@@ -106,16 +104,13 @@ void InitApp(void)
 
     AD1CON3bits.ADRC = 0; // System clock
     //AD1CON3bits.ADCS = 2; // Freq / 3
-    AD1CON3bits.ADCS = 22; // Freq / 3
+    AD1CON3bits.ADCS = 42; // Freq / 3
     // TAD = TCY * (ADCS + 1)
-    // TAD = 25.2438 * 1 =  25.2438 ns
-    // TCONV = 12 * TAD = 25.2438 ns * 12 = 908.7 ns (1.1 Mhz)
-    // ADCS = 164 = Tconv -> 50us
-
+    // TCONV = 12 * TAD
     // TSIM = TSMP + (M ? TCONV)
 
     // Sample time
-    AD1CON3bits.SAMC = 30;
+    AD1CON3bits.SAMC = 10;
 
     // Set as Inputs
     TRISAbits.TRISA0 = 1;
@@ -130,12 +125,41 @@ void InitApp(void)
     ANSELBbits.ANSB1 = 1;
 
     // DMA Usage
-    AD1CON4bits.ADDMAEN = 0; // DMA Disabled
+    AD1CON4bits.DMABL = 7;   // Each buffer contains 128 words
+    AD1CON4bits.ADDMAEN = 1; // DMA Enabled
+    AD1CON1bits.ADDMABM = 0; // Buffers in scatter gather mode
+    AD1CON2bits.SMPI = 3;    // 4 ADC buffers
+    DMA0CNTbits.CNT = 511; // Number of DMA transfers CNT + 1 = 512
+    
+    // DMA Specific registers DMA channel 0
+    
+    DMA0CONbits.DIR = 0;  // Reads from peripheral
+    DMA0CONbits.SIZE = 0; // Word
+    DMA0CONbits.AMODE = 2; // Peripheral Indirect Mode
+    DMA0CONbits.MODE = 2;  // Continous ping pong mode enabled
+    DMA0CONbits.HALF = 0; // Initiates interrupt when all buffer completes
+    
+    DMA0REQbits.FORCE = 0;  // Automatic trigger
+    DMA0REQbits.IRQSEL = 0b00001101; // ADC1 -ADC1 Convert done
+    
+    DMA0PAD = (volatile unsigned int)&ADC1BUF0;
+    
+    /* Ser RAM Addresses to copy to */
+    DMA0STAL = __builtin_dmaoffset(&BufferA);
+    DMA0STAH = 0;
+    
+    DMA0STBL = __builtin_dmaoffset(&BufferB);
+    DMA0STBH = 0;
+    
+    /* Set interrupts */
+    IFS0bits.DMA0IF = 0;  // Clear the DMA Interrupt flag bit
+    IEC0bits.DMA0IE = 1;  // Enable DMA0 interrupt
+    
+    DMA0CONbits.CHEN = 1; // Channel 0 enabled
 
     //IFS0bits.AD1IF = 1;
     IEC0bits.AD1IE = 1;
     IPC3bits.AD1IP = 5; // Higher priority for ADC interrupts
 
     INTCON2bits.GIE = 1; // Enable global interrupts
-    
 }

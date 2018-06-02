@@ -36,6 +36,15 @@ typedef unsigned long UINT32;
 typedef float FLOAT32;
 typedef long double FLOAT64;
 
+/* ADC Input buffers */
+typedef struct
+{
+    fractional Adc1Ch0[FFT_BLOCK_LENGTH];
+    fractional Adc1Ch1[FFT_BLOCK_LENGTH];
+    fractional Adc1Ch2[FFT_BLOCK_LENGTH];
+    fractional Adc1Ch3[FFT_BLOCK_LENGTH];
+} BufferType;
+
 /******************************************************************************/
 /* User Function Prototypes                                                   */
 /******************************************************************************/
@@ -46,7 +55,8 @@ void InitApp(void);         /* I/O and Peripheral Initialization */
 void InitDma(void);         /* DMA Initialization */
 void InitSerial(void);      /* UART initialization */
 
-INT16 ProcessADCSamples(INT16 *signal, UINT8 channel);
+void InitADCSignals(BufferType *inBuffer);
+INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2);
 FLOAT32 CalculateAverage(fractcomplex *signal);
 void calibration(void);
 void adcService(void);
@@ -74,23 +84,20 @@ extern UINT16 channel1_gains;
 extern UINT16 channel2_gains;
 extern UINT16 channel3_gains;
 
+extern BufferType BufferA;
+extern BufferType BufferB;
 
-/* ADC Input buffers */
-extern fractcomplex BufferA0_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-extern fractcomplex BufferA1_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-extern fractcomplex BufferA2_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-extern fractcomplex BufferA3_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
+extern fractcomplex Buffer0_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
+extern fractcomplex Buffer1_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
+extern fractcomplex Buffer2_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
+extern fractcomplex Buffer3_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
 
-extern fractcomplex BufferB0_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-extern fractcomplex BufferB1_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-extern fractcomplex BufferB2_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-extern fractcomplex BufferB3_regs[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-
-extern fractcomplex Buffer_results[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
-
+extern fractcomplex Buffer_results1[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
+extern fractcomplex Buffer_results2[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), aligned(FFT_BLOCK_LENGTH * 2 *2), far));
 /* Twiddle Factor array in Program memory */
 extern fractcomplex twiddleFactors[FFT_BLOCK_LENGTH/2] 	/* Declare Twiddle Factor array in X-space*/
 __attribute__ ((section (".xbss, bss, xmemory"), aligned (FFT_BLOCK_LENGTH*2)));
+extern fractional hammingWindow[FFT_BLOCK_LENGTH];
 
 extern const INT16 FFT_BINS[FFT_BLOCK_LENGTH];
 

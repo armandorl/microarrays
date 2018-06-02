@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <dsp.h>
 
@@ -30,18 +31,18 @@
 #define HALF_ADC_OFFSET       512
 
 UINT8 StartFlag = 0;
+#if 0
 static UINT32 FrameEnergyChan[4] = {0};
-
+#endif
 /*
  * 
  */
 
 void storeValues(void)
 {
+#if 0
     static UINT16 counter = 0;
     static UINT32 FrameEnergy = 0;
-    static UINT32 DynamicThreshold = 0;
-    static UINT8 firstTime = 1;
     INT16 tempVal = 0;
     INT16 tempSubVal = 0;
 //    INTCON2bits.GIE = 0; // Disable global interrupts
@@ -179,18 +180,67 @@ void storeValues(void)
 //    INTCON2bits.GIE = 1; // Enable global interrupts
     IFS0bits.AD1IF = 0; // ADC Interrupt flag
     PORTBbits.RB14 ^= 1;
+#endif
 }
 
-INT16 ProcessADCSamples(INT16 *signal, UINT8 channel)
+void InitADCSignals(BufferType *inBuffer)
 {
+    int i;
+    
+    /* Apply hamming window to all signals */
+    VectorWindow(FFT_BLOCK_LENGTH, 
+                 &inBuffer->Adc1Ch0[0], 
+                 &inBuffer->Adc1Ch0[0], 
+                 &hammingWindow[0]);
+    
+    VectorWindow(FFT_BLOCK_LENGTH, 
+                 &inBuffer->Adc1Ch1[0], 
+                 &inBuffer->Adc1Ch1[0], 
+                 &hammingWindow[0]);
+    
+    VectorWindow(FFT_BLOCK_LENGTH, 
+                 &inBuffer->Adc1Ch2[0], 
+                 &inBuffer->Adc1Ch2[0], 
+                 &hammingWindow[0]);
+    
+    VectorWindow(FFT_BLOCK_LENGTH, 
+                 &inBuffer->Adc1Ch3[0], 
+                 &inBuffer->Adc1Ch3[0], 
+                 &hammingWindow[0]);
+    
+    /* Convert signals to complex */
+    for(i=0; i < FFT_BLOCK_LENGTH; i++)
+    {
+        Buffer0_regs[i].real = inBuffer->Adc1Ch0[i];
+        Buffer1_regs[i].real = inBuffer->Adc1Ch1[i];
+        Buffer2_regs[i].real = inBuffer->Adc1Ch2[i];
+        Buffer3_regs[i].real = inBuffer->Adc1Ch3[i];
+        
+        Buffer0_regs[i].imag = 0;
+        Buffer1_regs[i].imag = 0;
+        Buffer2_regs[i].imag = 0;
+        Buffer3_regs[i].imag = 0;
+    }
+}
+
+
+INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2)
+{
+    INT32 peakFrequency = 0;    /* frequency of the largest spectral component */
+    INT16 peakFrequencyBin = 0;
+    INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
 
     /* Remove the signal offset */
-    
-    
+    FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal1,
+                 &twiddleFactors[0], COEFFS_IN_DATA);
+
+    SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
+
+    VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
 
     /* Detect if voice is available */
 
-    return 0;
+    return (INT16)peakFrequency;
 
 }
 
@@ -214,7 +264,7 @@ FLOAT32 CalculateAverage(fractcomplex *signal)
 
 void calibration(void)
 {
- 
+#if 0
     static UINT8 CalFinishFlag = 0;
     static FLOAT32 tempVal;
 
@@ -294,13 +344,13 @@ void calibration(void)
         }
         while(!CalFinishFlag);
     }
-
+#endif
 }
 
 
 void adcService(void)
 {
-    
+#if 0   
     INT32 peakFrequency = 0;    /* frequency of the largest spectral component */
     INT16 peakFrequencyBin = 0;
     INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
@@ -477,6 +527,6 @@ void adcService(void)
             writeString("\n\r");
 
     }
-    
+#endif
     
 }
