@@ -20,6 +20,7 @@
 #include <string.h>
 #include <math.h>
 #include <dsp.h>
+#include <libq.h>
 
 #include "fft.h"
 #include "user.h"
@@ -186,28 +187,42 @@ void storeValues(void)
 void InitADCSignals(BufferType *inBuffer)
 {
     int i;
-    
+    float myarray[1024];
+#if 0
     /* Apply hamming window to all signals */
     VectorWindow(FFT_BLOCK_LENGTH, 
                  &inBuffer->Adc1Ch0[0], 
                  &inBuffer->Adc1Ch0[0], 
-                 &hammingWindow[0]);
+                 &hanningWindow[0]);
     
     VectorWindow(FFT_BLOCK_LENGTH, 
                  &inBuffer->Adc1Ch1[0], 
                  &inBuffer->Adc1Ch1[0], 
-                 &hammingWindow[0]);
+                 &hanningWindow[0]);
     
     VectorWindow(FFT_BLOCK_LENGTH, 
                  &inBuffer->Adc1Ch2[0], 
                  &inBuffer->Adc1Ch2[0], 
-                 &hammingWindow[0]);
+                 &hanningWindow[0]);
     
     VectorWindow(FFT_BLOCK_LENGTH, 
                  &inBuffer->Adc1Ch3[0], 
                  &inBuffer->Adc1Ch3[0], 
-                 &hammingWindow[0]);
+                 &hanningWindow[0]);
+#endif 
+    for(i=0; i < 512; i++)
+    {
+        INTCON2bits.GIE = 0; // Enable global interrupts
+        myarray[i] = _itofQ15(i<<6);
+        INTCON2bits.GIE = 1; // Enable global interrupts
+    }
     
+    for(i=512; i < 1024; i++)
+    {
+        INTCON2bits.GIE = 0; // Enable global interrupts
+        myarray[i] = _itofQ15((i<<6)|0x8000);
+        INTCON2bits.GIE = 1; // Enable global interrupts
+    }
     /* Convert signals to complex */
     for(i=0; i < FFT_BLOCK_LENGTH; i++)
     {
@@ -221,6 +236,8 @@ void InitADCSignals(BufferType *inBuffer)
         Buffer2_regs[i].imag = 0;
         Buffer3_regs[i].imag = 0;
     }
+ 
+
 }
 
 
@@ -229,6 +246,11 @@ INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2)
     INT32 peakFrequency = 0;    /* frequency of the largest spectral component */
     INT16 peakFrequencyBin = 0;
     INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
+    fractional phaseSig1 = 0;
+    fractional phaseSig2 = 0;
+    FLOAT32 phaseFl1 = 0.0f;
+    FLOAT32 phaseFl2 = 0.0f;
+    FLOAT32 diffPhase = 0.0f;
 
     /* Remove the signal offset */
     FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal1,
@@ -237,7 +259,26 @@ INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2)
     SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
 
     VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
+    
+    phaseSig1 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin].imag, 
+                     Buffer_results1[peakFrequencyBin].real);
+    
+    FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal2,
+                 &twiddleFactors[0], COEFFS_IN_DATA);
 
+    SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
+
+    VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin);
+    
+    phaseSig2 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin].imag, 
+                     Buffer_results1[peakFrequencyBin].real);
+
+    phaseFl1 = _itofQ15(phaseSig1) * 180.0f;
+    phaseFl2 = _itofQ15(phaseSig2) * 180.0f;
+    diffPhase = phaseFl2 - phaseFl1;
+    
+    writeNumber((INT32)diffPhase);
+    writeString("\n");
     /* Detect if voice is available */
 
     return (INT16)peakFrequency;

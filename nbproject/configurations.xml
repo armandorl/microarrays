@@ -173,7 +173,7 @@
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="heap-size" value="128"/>
-        <property key="input-libraries" value="dsp"/>
+        <property key="input-libraries" value="dsp;q"/>
         <property key="linker-stack" value="true"/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
@@ -444,6 +444,12 @@
         <property key="warningmessagebreakoptions.W0113_SIM_WRITE_TO_PROTECTED_SFR"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0114_SIM_INVALID_KEY" value="report"/>
+        <property key="warningmessagebreakoptions.W0115_SIM_FAILED_TO_PARSE_DEVICE_FILE"
+                  value="report"/>
+        <property key="warningmessagebreakoptions.W0116_SIM_STACK_OVERFLOW"
+                  value="report"/>
+        <property key="warningmessagebreakoptions.W0117_SIM_STACK_UNDERFLOW"
+                  value="report"/>
         <property key="warningmessagebreakoptions.W0201_ADC_NO_STIMULUS_FILE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0202_ADC_GO_DONE_BIT" value="report"/>

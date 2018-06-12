@@ -41,7 +41,7 @@ fractcomplex Buffer_results2[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), al
 fractcomplex twiddleFactors[FFT_BLOCK_LENGTH/2] 	/* Declare Twiddle Factor array in X-space*/
 __attribute__ ((section (".xbss, bss, xmemory"), aligned (FFT_BLOCK_LENGTH*2)));
 
-fractional hammingWindow[FFT_BLOCK_LENGTH];
+fractional hanningWindow[FFT_BLOCK_LENGTH];
 
 INT8 currentFrame = 0;
 INT8 startService = 0;
@@ -69,7 +69,7 @@ INT16 main(void)
     /* Init constants for FFT */
     TwidFactorInit (LOG2_BLOCK_LENGTH, &twiddleFactors[0], 0);
     
-    HammingInit(FFT_BLOCK_LENGTH, &hammingWindow[0]);
+    HanningInit(FFT_BLOCK_LENGTH, &hanningWindow[0]);
     AD1CON1bits.ADON = 1;
 
     /* calibration(); */

@@ -97,7 +97,7 @@ extern fractcomplex Buffer_results2[FFT_BLOCK_LENGTH] __attribute__((space(ymemo
 /* Twiddle Factor array in Program memory */
 extern fractcomplex twiddleFactors[FFT_BLOCK_LENGTH/2] 	/* Declare Twiddle Factor array in X-space*/
 __attribute__ ((section (".xbss, bss, xmemory"), aligned (FFT_BLOCK_LENGTH*2)));
-extern fractional hammingWindow[FFT_BLOCK_LENGTH];
+extern fractional hanningWindow[FFT_BLOCK_LENGTH];
 
 extern const INT16 FFT_BINS[FFT_BLOCK_LENGTH];
 

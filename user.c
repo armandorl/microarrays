@@ -68,7 +68,8 @@ void InitApp(void)
 
     /* Setup analog functionality and port direction */
     AD1CON1bits.AD12B = 0; // 10-bit, 4 channel ADC
-    AD1CON1bits.FORM = 0b11; // 11 = Signed fractional (DOUT = sddd dddd dd00 0000, where s = sign, d = data)
+    //AD1CON1bits.FORM = 0b11; // 11 = Signed fractional (DOUT = sddd dddd dd00 0000, where s = sign, d = data)
+    AD1CON1bits.FORM = 3; // 11 = Signed fractional (DOUT = sddd dddd dd00 0000, where s = sign, d = data)
     AD1CON2bits.CHPS = 2; // Multichannel 4 channels
 //    AD1CON2bits.CHPS = 1; // Only CH0 and CH1
     AD1CON2bits.VCFG = 0;  // Vrefh = AVdd VrefL = AVss
