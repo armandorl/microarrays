@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <executable name="MicroArrays.hex">
+    <memory name="data">
+      <units>bytes</units>
+      <length>32768</length>
+      <used>5766</used>
+      <free>27002</free>
+    </memory>
+    <memory name="program">
+      <units>bytes</units>
+      <length>263394</length>
+      <used>11508</used>
+      <free>251886</free>
+    </memory>
+  </executable>
+</project>

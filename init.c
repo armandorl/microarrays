@@ -14,8 +14,8 @@
 #endif
 
 #include <stdint.h>          /* For uint16_t definition                       */
-#include <stdbool.h>         /* For true/false definition                     */
-#include "user.h"            /* variables/params used by user.c               */
+#include "init.h"
+#include "globals.h"         /* Map BufferA and BufferB to DMA */
 
 /******************************************************************************/
 /* User Functions                                                             */
@@ -51,14 +51,14 @@ void InitSerial(void)
     U1STAbits.UTXEN = 1;// Enable UART TX
 
 
-    /* Wait at least 105 microseconds (1/9600) before sending first char */
+    /* Wait at least 105 microseconds before sending first char */
     DELAY_105uS
 //    U1TXREG = 'a';// Transmit one characterwhile(1){}
 
 }
 
 
-void InitApp(void)
+void InitDmaAdc(void)
 {
     /* TODO Initialize User Ports/Peripherals/Project here */
     AD1CON1bits.ADON = 0;

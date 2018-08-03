@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c ScaleSignal.s Calibrate.s fft_binaries.c
+SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c interrupts.c main.c system.c traps.c vad.c serialDriver.c init.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o ${OBJECTDIR}/fft_binaries.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/user.o.d ${OBJECTDIR}/vad.o.d ${OBJECTDIR}/serialDriver.o.d ${OBJECTDIR}/ScaleSignal.o.d ${OBJECTDIR}/Calibrate.o.d ${OBJECTDIR}/fft_binaries.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/init.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.o.d ${OBJECTDIR}/interrupts.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/vad.o.d ${OBJECTDIR}/serialDriver.o.d ${OBJECTDIR}/init.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/user.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/ScaleSignal.o ${OBJECTDIR}/Calibrate.o ${OBJECTDIR}/fft_binaries.o
+OBJECTFILES=${OBJECTDIR}/configuration_bits.o ${OBJECTDIR}/interrupts.o ${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/vad.o ${OBJECTDIR}/serialDriver.o ${OBJECTDIR}/init.o
 
 # Source Files
-SOURCEFILES=configuration_bits.c interrupts.c main.c system.c traps.c user.c vad.c serialDriver.c ScaleSignal.s Calibrate.s fft_binaries.c
+SOURCEFILES=configuration_bits.c interrupts.c main.c system.c traps.c vad.c serialDriver.c init.c
 
 
 CFLAGS=
@@ -129,13 +129,6 @@ ${OBJECTDIR}/traps.o: traps.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  traps.c  -o ${OBJECTDIR}/traps.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/traps.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -mno-eds-warn  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/traps.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/user.o: user.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/user.o.d 
-	@${RM} ${OBJECTDIR}/user.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  user.c  -o ${OBJECTDIR}/user.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/user.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -mno-eds-warn  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/user.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
 ${OBJECTDIR}/vad.o: vad.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/vad.o.d 
@@ -150,12 +143,12 @@ ${OBJECTDIR}/serialDriver.o: serialDriver.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  serialDriver.c  -o ${OBJECTDIR}/serialDriver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/serialDriver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -mno-eds-warn  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/serialDriver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/fft_binaries.o: fft_binaries.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/init.o: init.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/fft_binaries.o.d 
-	@${RM} ${OBJECTDIR}/fft_binaries.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  fft_binaries.c  -o ${OBJECTDIR}/fft_binaries.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/fft_binaries.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -mno-eds-warn  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/fft_binaries.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/init.o.d 
+	@${RM} ${OBJECTDIR}/init.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  init.c  -o ${OBJECTDIR}/init.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/init.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -mno-eds-warn  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/init.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/configuration_bits.o: configuration_bits.c  nbproject/Makefile-${CND_CONF}.mk
@@ -193,13 +186,6 @@ ${OBJECTDIR}/traps.o: traps.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  traps.c  -o ${OBJECTDIR}/traps.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/traps.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/traps.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/user.o: user.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/user.o.d 
-	@${RM} ${OBJECTDIR}/user.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  user.c  -o ${OBJECTDIR}/user.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/user.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/user.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
 ${OBJECTDIR}/vad.o: vad.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/vad.o.d 
@@ -214,47 +200,19 @@ ${OBJECTDIR}/serialDriver.o: serialDriver.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  serialDriver.c  -o ${OBJECTDIR}/serialDriver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/serialDriver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/serialDriver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/fft_binaries.o: fft_binaries.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/init.o: init.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/fft_binaries.o.d 
-	@${RM} ${OBJECTDIR}/fft_binaries.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  fft_binaries.c  -o ${OBJECTDIR}/fft_binaries.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/fft_binaries.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/fft_binaries.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/init.o.d 
+	@${RM} ${OBJECTDIR}/init.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  init.c  -o ${OBJECTDIR}/init.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/init.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD)  -msmall-code -msmall-data -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/init.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: assemble
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/ScaleSignal.o: ScaleSignal.s  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/ScaleSignal.o.d 
-	@${RM} ${OBJECTDIR}/ScaleSignal.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  ScaleSignal.s  -o ${OBJECTDIR}/ScaleSignal.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/ScaleSignal.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_SIMULATOR=1,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/ScaleSignal.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
-	
-${OBJECTDIR}/Calibrate.o: Calibrate.s  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Calibrate.o.d 
-	@${RM} ${OBJECTDIR}/Calibrate.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_SIMULATOR=1,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/Calibrate.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
-	
 else
-${OBJECTDIR}/ScaleSignal.o: ScaleSignal.s  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/ScaleSignal.o.d 
-	@${RM} ${OBJECTDIR}/ScaleSignal.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  ScaleSignal.s  -o ${OBJECTDIR}/ScaleSignal.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/ScaleSignal.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/ScaleSignal.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
-	
-${OBJECTDIR}/Calibrate.o: Calibrate.s  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Calibrate.o.d 
-	@${RM} ${OBJECTDIR}/Calibrate.o 
-	${MP_CC} $(MP_EXTRA_AS_PRE)  Calibrate.s  -o ${OBJECTDIR}/Calibrate.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -DXPRJ_C30_dsPIC33EP256GP502=$(CND_CONF)  -no-legacy-libc  -I"C:/Microchip/xc16/v1.11/src/inc" -Wa,-MD,"${OBJECTDIR}/Calibrate.o.d",--defsym=__MPLAB_BUILD=1,-g,--no-relax$(MP_EXTRA_AS_POST)
-	@${FIXDEPS} "${OBJECTDIR}/Calibrate.o.d"  $(SILENT)  -rsi ${MP_CC_DIR}../  
-	
 endif
 
 # ------------------------------------------------------------------------------------
