@@ -10,7 +10,7 @@
 /******************************************************************************/
 /* User Level #define Macros                                                  */
 /******************************************************************************/
-#define HANNING_WINDOW 1
+/* #define HANNING_WINDOW 1 */
 
 /* ADC Input buffers */
 typedef struct

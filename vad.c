@@ -59,7 +59,6 @@ void InitADCSignals(BufferType *inBuffer)
                  &inBuffer->Adc1Ch3[0], 
                  &hanningWindow[0]);
 #endif
-
     /* Convert signals to complex */
     for(i=0; i < FFT_BLOCK_LENGTH; i++)
     {
@@ -73,6 +72,11 @@ void InitADCSignals(BufferType *inBuffer)
         Buffer2_regs[i].imag = 0;
         Buffer3_regs[i].imag = 0;
     }
+    
+    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer0_regs[0], &Buffer0_regs[0], Q15(0.5));
+    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer1_regs[0], &Buffer1_regs[0], Q15(0.5));
+    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer2_regs[0], &Buffer2_regs[0], Q15(0.5));
+    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer3_regs[0], &Buffer3_regs[0], Q15(0.5));
 }
 
 
@@ -90,24 +94,32 @@ INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2)
 
     /* Signal 1 */
     /* Calculate the FFT */
+    //INTCON2bits.GIE = 0; // Disable global interrupts
     FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal1,
                  &twiddleFactors[0], COEFFS_IN_DATA);
+    //INTCON2bits.GIE = 1; // Enable global interrupts
 
+    /* BitReverseComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0]); */
     /* Calculate the magnitude */
     SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
 
     /* Get the index of the greatest magnitude */
     VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
-    
+
     /* Get the phase in the max magnitude bin */
-    phaseSig1 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin1].imag, 
-                     Buffer_results1[peakFrequencyBin1].real);
+    INTCON2bits.GIE = 0;
+    phaseSig1 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin1].real, 
+                     Buffer_results1[peakFrequencyBin1].imag);
+    INTCON2bits.GIE = 1;
     
     /* Signal 2 */
     /* Calculate the FFT */
+    //INTCON2bits.GIE = 0; // Disable global interrupts
     FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal2,
                  &twiddleFactors[0], COEFFS_IN_DATA);
+    //INTCON2bits.GIE = 1; // Enable global interrupts
 
+    /* BitReverseComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0]); */
     /* Calculate the magnitude */
     SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
 
@@ -115,18 +127,20 @@ INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2)
     VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin2);
     
     /* Get the phase in the max magnitude bin */
-    phaseSig2 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin2].imag, 
-                     Buffer_results1[peakFrequencyBin2].real);
+    INTCON2bits.GIE = 0;
+    phaseSig2 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin2].real, 
+                     Buffer_results1[peakFrequencyBin2].imag);
+    INTCON2bits.GIE = 1;
 
     /* Only calculate difference in phases if the same freq bin is at Max value */
     /* If different bins are found it is possible that the signals are noisy or */
     /* one microphone detected another signal with greater energy which would   */
     /* provide an invalid calculation */
-    writeString("F1:");
+    /*writeString("F1:");
     writeNumber(peakFrequencyBin1);
     writeString(" F2:");
     writeNumber(peakFrequencyBin2);
-    
+    */
     if(peakFrequencyBin1 == peakFrequencyBin2)
     {
         peakFrequencyBin = 0;
@@ -136,11 +150,11 @@ INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2)
         INTCON2bits.GIE = 1; // Enable global interrupts
         diffPhase = phaseFl2 - phaseFl1;
 
-        writeString(" ");
+        /*writeString(" ");
         writeNumber((INT32)phaseFl2);
         writeString(" ");
         writeNumber((INT32)phaseFl1);
-        writeString("\n");
+        writeString("\n");*/
     }
 
     return (INT16)peakFrequencyBin;

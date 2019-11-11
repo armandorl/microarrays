@@ -57,6 +57,20 @@ void InitSerial(void)
 
 }
 
+void InitTimer3(void)
+{
+    T3CONbits.TON = 0; // Disable Timer
+    T3CONbits.TCS = 0; // Select internal instruction cycle clock
+    T3CONbits.TGATE = 0; // Disable Gated Timer mode
+    T3CONbits.TCKPS = 0; // Select 1:1 Prescaler
+    TMR3 = 0x00; // Clear timer register
+    PR3 = 1293; // Load the period value
+    IPC2bits.T3IP = 7; // Set Timer 1 Interrupt Priority Level
+    IFS0bits.T3IF = 0; // Clear Timer 1 Interrupt Flag
+    IEC0bits.T3IE = 1; // Enable Timer1 interrupt
+
+}
+
 
 void InitDmaAdc(void)
 {
@@ -80,7 +94,8 @@ void InitDmaAdc(void)
         // Control ADC
     AD1CON1bits.ASAM = 1; // Automatic sampling on
     AD1CON1bits.SSRCG = 0; // Automatic
-    AD1CON1bits.SSRC = 7; // Automatic conversion
+    //AD1CON1bits.SSRC = 7; // Automatic conversion
+    AD1CON1bits.SSRC = 2; // Timer3 sets sampling and conversion
 
     // Enable simultaneous sampling
     AD1CON1bits.SIMSAM = 1;
@@ -105,13 +120,15 @@ void InitDmaAdc(void)
 
     AD1CON3bits.ADRC = 0; // System clock
     //AD1CON3bits.ADCS = 2; // Freq / 3
-    AD1CON3bits.ADCS = 42; // Freq / 3
+    //AD1CON3bits.ADCS = 42; // Freq / 3
+    AD1CON3bits.ADCS = 4; // Freq / 3
     // TAD = TCY * (ADCS + 1)
     // TCONV = 12 * TAD
     // TSIM = TSMP + (M ? TCONV)
 
     // Sample time
-    AD1CON3bits.SAMC = 10;
+    //AD1CON3bits.SAMC = 10;
+    AD1CON3bits.SAMC = 3;
 
     // Set as Inputs
     TRISAbits.TRISA0 = 1;
@@ -161,6 +178,7 @@ void InitDmaAdc(void)
     //IFS0bits.AD1IF = 1;
     IEC0bits.AD1IE = 1;
     IPC3bits.AD1IP = 5; // Higher priority for ADC interrupts
+    IPC1bits.DMA0IP = 3;
 
     INTCON2bits.GIE = 1; // Enable global interrupts
 }

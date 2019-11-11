@@ -21,6 +21,8 @@
 #include "serialDriver.h"
 #include "dsp.h"
 #include "globals.h"
+#include "vad.h"
+
 
 /******************************************************************************/
 /* Global Variable Declaration                                                */
@@ -43,6 +45,8 @@ fractcomplex Buffer_results2[FFT_BLOCK_LENGTH] __attribute__((space(ymemory), al
 fractcomplex twiddleFactors[FFT_BLOCK_LENGTH/2] 	/* Declare Twiddle Factor array in X-space*/
 __attribute__ ((section (".xbss, bss, xmemory"), aligned (FFT_BLOCK_LENGTH*2)));
 
+volatile char curr_buffer = 0;
+
 #if defined(HANNING_WINDOW) /* Hanning window disabled */
 /* Hanning window */
 fractional hanningWindow[FFT_BLOCK_LENGTH];
@@ -61,6 +65,7 @@ INT16 main(void)
     /* Initialize IO ports and peripherals */
     InitDmaAdc();
     InitSerial();
+    InitTimer3();
 
     /* We need to do this only once at start-up */
     writeString("Micro Arrays  VER.1.00\n\r");
@@ -81,12 +86,43 @@ INT16 main(void)
 
     /* Initialize ADC */
     AD1CON1bits.ADON = 1;
-
+    T3CONbits.TON = 1; // Start Timer
+    
     /* calibration(); */
+    
+    while(curr_buffer == 0)
+    {
+        /* Wait for first DMA interrupt */
+    }
     
     while(1)
     {
-        /* Do nothing flow is controlled by DMA interrupts */
-    }
+        if(curr_buffer == 1)
+        {
+            curr_buffer = 0;
+            if(((volatile unsigned int)DMAPPS) & 0x01)
+            {
+                //PORTBbits.RB15 ^= 1;
 
+                InitADCSignals(&BufferA);
+
+                /* When buffer B is selected process Buffer A */
+                ProcessADCSamples(&Buffer0_regs[0], &Buffer1_regs[0]);
+
+                //PORTBbits.RB15 ^= 1;
+            }
+            else
+            {
+                //PORTBbits.RB15 ^= 1;
+                /* When buffer A is selected process Buffer B */
+                InitADCSignals(&BufferB);
+
+                /* When buffer B is selected process Buffer A */
+                ProcessADCSamples(&Buffer0_regs[0], &Buffer1_regs[0]);
+
+                //PORTBbits.RB15 ^= 1;
+
+            }
+        }
+    }
 }

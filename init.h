@@ -39,7 +39,7 @@ extern "C" {
 
 
 /** Definitions for UART initialization */    
-#define FP  39875000
+#define FP  57750000
 #define BAUDRATE 115200
 #define BRGVAL ((FP/BAUDRATE)/16)-1
 #define DELAY_105uS asm volatile ("REPEAT, #201"); Nop();// 105uS dela
@@ -47,6 +47,7 @@ extern "C" {
 
 void InitDmaAdc(void);      /* I/O and Peripheral Initialization */
 void InitSerial(void);      /* UART initialization */
+void InitTimer3(void);
 
 #ifdef	__cplusplus
 }

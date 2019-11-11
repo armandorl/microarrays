@@ -15,7 +15,7 @@
             <url>vad.c</url>
             <bookmark id="0">
                 <name/>
-                <line>100</line>
+                <line>35</line>
                 <key/>
             </bookmark>
         </file>
@@ -23,15 +23,28 @@
             <url>main.c</url>
             <bookmark id="0">
                 <name/>
-                <line>74</line>
+                <line>86</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/serialDriver.c</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/vad.h</file>
             <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/interrupts.c</file>
             <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/vad.c</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/fft.h</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/traps.c</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/main.c</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/init.h</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/serialDriver.h</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/globals.h</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/cdefs.h</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/system.h</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/init.c</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/system.c</file>
+            <file>file:/D:/Programming/Microchip/MicrophoneArray/microarrays/dsp.h</file>
         </group>
     </open-files>
 </project-private>

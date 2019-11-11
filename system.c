@@ -48,9 +48,16 @@ void ConfigureOscillator(void)
         CLKDIVbits.DOZEN = 0;
         CLKDIVbits.DOZE = 0;
 
-        PLLFBDbits.PLLDIV = 56;
-        CLKDIVbits.PLLPRE = 2;
+        PLLFBDbits.PLLDIV = 40;
+        CLKDIVbits.PLLPRE = 0;
         CLKDIVbits.PLLPOST = 0;
+        
+        /* Set deterministic 13 instruction interrupt overhead */
+        CORCONbits.VAR = 0;
+        CORCONbits.IPL3 = 0;
+        
+        /* Interrup nesting enabled */
+        INTCON1bits.NSTDIS = 0;
         
 }
 
