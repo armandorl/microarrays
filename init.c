@@ -64,7 +64,7 @@ void InitTimer3(void)
     T3CONbits.TGATE = 0; // Disable Gated Timer mode
     T3CONbits.TCKPS = 0; // Select 1:1 Prescaler
     TMR3 = 0x00; // Clear timer register
-    PR3 = 1293; // Load the period value
+    PR3 = 3609; // Load the period value
     IPC2bits.T3IP = 7; // Set Timer 1 Interrupt Priority Level
     IFS0bits.T3IF = 0; // Clear Timer 1 Interrupt Flag
     IEC0bits.T3IE = 1; // Enable Timer1 interrupt

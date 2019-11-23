@@ -66,16 +66,17 @@ INT16 main(void)
     InitDmaAdc();
     InitSerial();
     InitTimer3();
+    InitRingBuffer();
 
     /* We need to do this only once at start-up */
-    writeString("Micro Arrays  VER.1.00\n\r");
+    writeStringBlk("Micro Arrays  VER.1.00\n\r");
 
-    writeNumber(0x12345678);
-    writeString("\n\r");
-    writeNumber(0xabcd1234);
-    writeString("\n\r");
-    writeNumber(100);
-    writeString("\n\r");
+    writeNumberBlk(0x12345678);
+    writeStringBlk("\n\r");
+    writeNumberBlk(0xabcd1234);
+    writeStringBlk("\n\r");
+    writeNumberBlk(100);
+    writeStringBlk("\n\r");
     
     /* Init constants for FFT */
     TwidFactorInit (LOG2_BLOCK_LENGTH, &twiddleFactors[0], 0);
@@ -107,7 +108,10 @@ INT16 main(void)
                 InitADCSignals(&BufferA);
 
                 /* When buffer B is selected process Buffer A */
-                ProcessADCSamples(&Buffer0_regs[0], &Buffer1_regs[0]);
+                ProcessADCSamples(&Buffer0_regs[0], 
+                                  &Buffer1_regs[0],
+                                  &Buffer2_regs[0],
+                                  &Buffer3_regs[0]);
 
                 //PORTBbits.RB15 ^= 1;
             }
@@ -118,11 +122,17 @@ INT16 main(void)
                 InitADCSignals(&BufferB);
 
                 /* When buffer B is selected process Buffer A */
-                ProcessADCSamples(&Buffer0_regs[0], &Buffer1_regs[0]);
+                ProcessADCSamples(&Buffer0_regs[0], 
+                                  &Buffer1_regs[0],
+                                  &Buffer2_regs[0],
+                                  &Buffer3_regs[0]);
 
                 //PORTBbits.RB15 ^= 1;
 
             }
+            
         }
+        
+        ringSendData();
     }
 }

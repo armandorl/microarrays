@@ -193,9 +193,9 @@ void __attribute__((interrupt,no_auto_psv)) _SoftTrapError(void)
 
 static void printErrorCode(INT32 errNo)
 {
-    writeString("Exception:");
-    writeNumber(errNo);
-    writeString("\n");
+    writeStringBlk("Exception:");
+    writeNumberBlk(errNo);
+    writeStringBlk("\n");
 }
 
 #endif

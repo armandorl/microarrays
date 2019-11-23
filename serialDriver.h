@@ -12,9 +12,17 @@
 
 #define MAX_UART_CHARS 128
 
-INT16 writeString(INT8 * text);
-INT16 writeNumber(INT32 value);
-INT16 writeRoundFloatNum(FLOAT32 value);
+void InitRingBuffer(void);
+void ringSendData(void);
+
+INT16 writeStringAsync(INT8 * text);
+INT16 writeNumberAsync(INT32 value);
+INT16 writeRoundFloatNumAsync(FLOAT32 value);
+
+INT16 writeStringBlk(INT8 * text);
+INT16 writeNumberBlk(INT32 value);
+INT16 writeRoundFloatNumBlk(FLOAT32 value);
+
 INT8 getCharacter(void);
 
 #endif	/* SERIALDRIVER_H */

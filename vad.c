@@ -25,14 +25,22 @@
 #include "globals.h"
 #include "serialDriver.h"
 
+static fractional getPhaseAndMaxFreq(fractcomplex *signal1, INT16* peakFrequencyBin);
+static void printPhaseDiff(INT16 freq1, fractional phase1, INT16 freq2, fractional phase2);
 
-UINT8 StartFlag = 0;
+static _Q15 oneEighty;
 #if 0
 static UINT32 FrameEnergyChan[4] = {0};
 #endif
 /*
  * 
  */
+
+void InitADCconstants()
+{
+    oneEighty = _Q15ftoi(180.f);
+}
+
 
 void InitADCSignals(BufferType *inBuffer)
 {
@@ -80,83 +88,94 @@ void InitADCSignals(BufferType *inBuffer)
 }
 
 
-INT16 ProcessADCSamples(fractcomplex *signal1, fractcomplex *signal2)
+void ProcessADCSamples(fractcomplex *signal1, 
+                       fractcomplex *signal2,
+                       fractcomplex *signal3,
+                       fractcomplex *signal4)
 {
-    INT16 peakFrequencyBin = 0;
-    INT16 peakFrequencyBin1 = 0;
-    INT16 peakFrequencyBin2 = 0;
-    INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
     fractional phaseSig1 = 0;
     fractional phaseSig2 = 0;
+    fractional phaseSig3 = 0;
+    fractional phaseSig4 = 0;
+    
+    INT16 peakFrequencyBin1 = 0;
+    INT16 peakFrequencyBin2 = 0;
+    INT16 peakFrequencyBin3 = 0;
+    INT16 peakFrequencyBin4 = 0;
+
+    /* Signal 1 */
+    phaseSig1 = getPhaseAndMaxFreq(signal1, &peakFrequencyBin1);
+    
+    /* Signal 2 */
+    phaseSig2 = getPhaseAndMaxFreq(signal2, &peakFrequencyBin2);
+    
+    /* Signal 3 */
+    phaseSig3 = getPhaseAndMaxFreq(signal3, &peakFrequencyBin3);
+    
+    /* Signal 4 */
+    phaseSig4 = getPhaseAndMaxFreq(signal4, &peakFrequencyBin4);
+    
+    printPhaseDiff(peakFrequencyBin1, peakFrequencyBin2, phaseSig1, phaseSig2);
+    writeStringAsync("/");
+    printPhaseDiff(peakFrequencyBin1, peakFrequencyBin3, phaseSig1, phaseSig3);
+    writeStringAsync("/");
+    printPhaseDiff(peakFrequencyBin1, peakFrequencyBin4, phaseSig1, phaseSig4);
+    writeStringAsync("\n");
+
+}
+
+static fractional getPhaseAndMaxFreq(fractcomplex *signal, INT16* peakFrequencyBin)
+{
+    INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
+    fractional phaseSig = 0;
+ 
+    /* Calculate the FFT */
+    //INTCON2bits.GIE = 0; // Disable global interrupts
+    FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal,
+                 &twiddleFactors[0], COEFFS_IN_DATA);
+    //INTCON2bits.GIE = 1; // Enable global interrupts
+
+    /* BitReverseComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0]); */
+    /* Calculate the magnitude */
+    SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
+
+    /* Get the index of the greatest magnitude */
+    VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], peakFrequencyBin);
+    /* Get the phase in the max magnitude bin */
+    INTCON2bits.GIE = 0;
+    phaseSig = _Q15atanYByXByPI(Buffer_results1[*peakFrequencyBin].real, 
+                     Buffer_results1[*peakFrequencyBin].imag);
+    INTCON2bits.GIE = 1;
+    
+    return phaseSig;
+}
+
+static void printPhaseDiff(INT16 freq1, INT16 freq2, fractional phase1, fractional phase2)
+{
     FLOAT32 phaseFl1 = 0.0f;
     FLOAT32 phaseFl2 = 0.0f;
     FLOAT32 diffPhase = 0.0f;
-
-    /* Signal 1 */
-    /* Calculate the FFT */
-    //INTCON2bits.GIE = 0; // Disable global interrupts
-    FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal1,
-                 &twiddleFactors[0], COEFFS_IN_DATA);
-    //INTCON2bits.GIE = 1; // Enable global interrupts
-
-    /* BitReverseComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0]); */
-    /* Calculate the magnitude */
-    SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
-
-    /* Get the index of the greatest magnitude */
-    VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin1);
-
-    /* Get the phase in the max magnitude bin */
-    INTCON2bits.GIE = 0;
-    phaseSig1 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin1].real, 
-                     Buffer_results1[peakFrequencyBin1].imag);
-    INTCON2bits.GIE = 1;
-    
-    /* Signal 2 */
-    /* Calculate the FFT */
-    //INTCON2bits.GIE = 0; // Disable global interrupts
-    FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0], signal2,
-                 &twiddleFactors[0], COEFFS_IN_DATA);
-    //INTCON2bits.GIE = 1; // Enable global interrupts
-
-    /* BitReverseComplex(LOG2_BLOCK_LENGTH, &Buffer_results1[0]); */
-    /* Calculate the magnitude */
-    SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results1[0], &squaredOutput[0]);
-
-    /* Get the index of the greatest magnitude */
-    VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], &peakFrequencyBin2);
-    
-    /* Get the phase in the max magnitude bin */
-    INTCON2bits.GIE = 0;
-    phaseSig2 = _Q15atanYByXByPI(Buffer_results1[peakFrequencyBin2].real, 
-                     Buffer_results1[peakFrequencyBin2].imag);
-    INTCON2bits.GIE = 1;
-
     /* Only calculate difference in phases if the same freq bin is at Max value */
     /* If different bins are found it is possible that the signals are noisy or */
     /* one microphone detected another signal with greater energy which would   */
     /* provide an invalid calculation */
-    /*writeString("F1:");
-    writeNumber(peakFrequencyBin1);
-    writeString(" F2:");
-    writeNumber(peakFrequencyBin2);
-    */
-    if(peakFrequencyBin1 == peakFrequencyBin2)
+
+    if( (0 != freq1) && (freq1 == freq2))
     {
-        peakFrequencyBin = 0;
         INTCON2bits.GIE = 0; // Disable global interrupts
-        phaseFl1 = _itofQ15(phaseSig1) * 180.0f;
-        phaseFl2 = _itofQ15(phaseSig2) * 180.0f;
+        phaseFl1 = _itofQ15(phase1) * 180.0f;
+        phaseFl2 = _itofQ15(phase2) * 180.0f;
         INTCON2bits.GIE = 1; // Enable global interrupts
+
         diffPhase = phaseFl2 - phaseFl1;
-
-        /*writeString(" ");
-        writeNumber((INT32)phaseFl2);
-        writeString(" ");
-        writeNumber((INT32)phaseFl1);
-        writeString("\n");*/
+#if 1
+        writeNumberAsync((INT32)freq1);
+        writeStringAsync(":");
+        writeNumberAsync((INT32)diffPhase);
+#endif
     }
-
-    return (INT16)peakFrequencyBin;
-
+    else
+    {
+        writeStringAsync("XXX");
+    }
 }

@@ -32,16 +32,16 @@
 #define	XC_INIT_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
-
+#include "system.h"
 #ifdef	__cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 
 /** Definitions for UART initialization */    
-#define FP  57750000
-#define BAUDRATE 115200
-#define BRGVAL ((FP/BAUDRATE)/16)-1
+#define FP  FCY
+#define BAUDRATE 1843200
+#define BRGVAL (((FP/BAUDRATE)/16)-1)
 #define DELAY_105uS asm volatile ("REPEAT, #201"); Nop();// 105uS dela
 
 
