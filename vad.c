@@ -24,11 +24,13 @@
 #include "fft.h"
 #include "globals.h"
 #include "serialDriver.h"
-
+    
 static fractional getPhaseAndMaxFreq(fractcomplex *signal1, INT16* peakFrequencyBin);
+static fractional getPhaseAndMaxFreqCC(fractcomplex *signal, INT16* peakFrequencyBin);
 static void printPhaseDiff(INT16 freq1, fractional phase1, INT16 freq2, fractional phase2);
 
 static _Q15 oneEighty;
+static INT16 freqRange[FFT_BLOCK_LENGTH / 2];
 #if 0
 static UINT32 FrameEnergyChan[4] = {0};
 #endif
@@ -36,9 +38,15 @@ static UINT32 FrameEnergyChan[4] = {0};
  * 
  */
 
-void InitADCconstants()
+void InitADCconstants(void)
 {
-    oneEighty = _Q15ftoi(180.f);
+    int i=0;
+    oneEighty = Q15(180.0);
+    for(i=0; i < (FFT_BLOCK_LENGTH/2); i++)
+    {
+        freqRange[i] = SAMPLING_RATE * (1 / FFT_BLOCK_LENGTH);
+    }
+    
 }
 
 
@@ -81,10 +89,10 @@ void InitADCSignals(BufferType *inBuffer)
         Buffer3_regs[i].imag = 0;
     }
     
-    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer0_regs[0], &Buffer0_regs[0], Q15(0.5));
-    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer1_regs[0], &Buffer1_regs[0], Q15(0.5));
-    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer2_regs[0], &Buffer2_regs[0], Q15(0.5));
-    VectorScale(FFT_BLOCK_LENGTH * 2, &Buffer3_regs[0], &Buffer3_regs[0], Q15(0.5));
+    VectorScale(FFT_BLOCK_LENGTH * 2, (fractional*)&Buffer0_regs[0], (fractional*)&Buffer0_regs[0], Q15(0.5));
+    VectorScale(FFT_BLOCK_LENGTH * 2, (fractional*)&Buffer1_regs[0], (fractional*)&Buffer1_regs[0], Q15(0.5));
+    VectorScale(FFT_BLOCK_LENGTH * 2, (fractional*)&Buffer2_regs[0], (fractional*)&Buffer2_regs[0], Q15(0.5));
+    VectorScale(FFT_BLOCK_LENGTH * 2, (fractional*)&Buffer3_regs[0], (fractional*)&Buffer3_regs[0], Q15(0.5));
 }
 
 
@@ -107,13 +115,13 @@ void ProcessADCSamples(fractcomplex *signal1,
     phaseSig1 = getPhaseAndMaxFreq(signal1, &peakFrequencyBin1);
     
     /* Signal 2 */
-    phaseSig2 = getPhaseAndMaxFreq(signal2, &peakFrequencyBin2);
+    phaseSig2 = getPhaseAndMaxFreqCC(signal2, &peakFrequencyBin2);
     
     /* Signal 3 */
-    phaseSig3 = getPhaseAndMaxFreq(signal3, &peakFrequencyBin3);
+    phaseSig3 = getPhaseAndMaxFreqCC(signal3, &peakFrequencyBin3);
     
     /* Signal 4 */
-    phaseSig4 = getPhaseAndMaxFreq(signal4, &peakFrequencyBin4);
+    phaseSig4 = getPhaseAndMaxFreqCC(signal4, &peakFrequencyBin4);
     
     printPhaseDiff(peakFrequencyBin1, peakFrequencyBin2, phaseSig1, phaseSig2);
     writeStringAsync("/");
@@ -145,6 +153,52 @@ static fractional getPhaseAndMaxFreq(fractcomplex *signal, INT16* peakFrequencyB
     INTCON2bits.GIE = 0;
     phaseSig = _Q15atanYByXByPI(Buffer_results1[*peakFrequencyBin].real, 
                      Buffer_results1[*peakFrequencyBin].imag);
+    INTCON2bits.GIE = 1;
+    
+    return phaseSig;
+}
+
+static fractional getPhaseAndMaxFreqCC(fractcomplex *signal, INT16* peakFrequencyBin)
+{
+    INT16 squaredOutput[FFT_BLOCK_LENGTH / 2] = {0};
+    fractional phaseSig = 0;
+    INT16 temp, i;
+    fractcomplex temp_results[FFT_BLOCK_LENGTH/2];
+ 
+    /* Calculate the FFT */
+    FFTComplex(LOG2_BLOCK_LENGTH, &Buffer_results2[0], signal,
+                 &twiddleFactors[0], COEFFS_IN_DATA);
+
+    for(i=0; i < (FFT_BLOCK_LENGTH / 2); i++)
+    {
+        temp_results[i].real = Buffer_results2[i].real;
+        temp_results[i].imag = Buffer_results2[i].imag;
+    }
+    BitReverseComplex(LOG2_BLOCK_LENGTH, &Buffer_results2[0]);
+    
+    temp = CORCONbits.IF;
+    for(i=0; i < (FFT_BLOCK_LENGTH / 2); i++)
+    {
+        INTCON2bits.GIE = 0;
+        Buffer_results2[i].imag = _Q15neg(Buffer_results2[i].imag);
+        CORCONbits.IF = 0;
+        Buffer_results2[i].real = Buffer_results1[i].real * Buffer_results2[i].real;
+        Buffer_results2[i].imag = Buffer_results1[i].imag * Buffer_results2[i].imag;
+        CORCONbits.IF = 1;
+        INTCON2bits.GIE = 1;
+    }
+    CORCONbits.IF = temp;
+    
+    /* Calculate the magnitude */
+    SquareMagnitudeCplx(FFT_BLOCK_LENGTH / 2, &Buffer_results2[0], &squaredOutput[0]);
+
+    /* Get the index of the greatest magnitude */
+    VectorMax(FFT_BLOCK_LENGTH/2, &squaredOutput[0], peakFrequencyBin);
+
+    /* Get the phase in the max magnitude bin */
+    INTCON2bits.GIE = 0;
+    phaseSig = _Q15atanYByXByPI(temp_results[*peakFrequencyBin].real, 
+                     temp_results[*peakFrequencyBin].imag);
     INTCON2bits.GIE = 1;
     
     return phaseSig;

@@ -41,6 +41,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 void InitADCSignals(BufferType *inBuffer);
+void InitADCconstants(void);
 void ProcessADCSamples(fractcomplex *signal1, 
                        fractcomplex *signal2,
                        fractcomplex *signal3,

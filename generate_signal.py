@@ -18,9 +18,9 @@ signal2 = []
 signal3 = []
 signal4 = []
 phase1 = 0 * toRad
-phase2 = 5 * toRad
-phase3 = 10 * toRad
-phase4 = 15 * toRad
+phase2 = 10 * toRad
+phase3 = 20 * toRad
+phase4 = 30 * toRad
 
 
 def toADC(value):

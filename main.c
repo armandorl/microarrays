@@ -67,6 +67,7 @@ INT16 main(void)
     InitSerial();
     InitTimer3();
     InitRingBuffer();
+    InitADCconstants();
 
     /* We need to do this only once at start-up */
     writeStringBlk("Micro Arrays  VER.1.00\n\r");

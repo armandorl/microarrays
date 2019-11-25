@@ -76,18 +76,64 @@ INT16 writeStringBlk(INT8 * text)
 INT16 writeNumberAsync(INT32 value)
 {
     UINT8 ret = 0;
+    char text[6];
     
     if(value < 0)
     {
        writeStringAsync("-");
        value = value * -1;
     }
+    char temp5 = getHexValue((value % 100000) / 10000);
+    char temp4 = getHexValue((value % 10000)  / 1000);
+    char temp3 = getHexValue((value % 1000)   / 100);
+    char temp2 = getHexValue(((value % 100)   / 10));
+    char temp1 = getHexValue((value % 10));
     
-    /* As we are printing angles, assume the max value has 3 digits */
-    char temp1 = getHexValue(value / 100);
-    char temp2 = getHexValue((value % 100) / 10);
-    char temp3 = getHexValue(value % 10);
-    char text[] = {temp1, temp2, temp3, '\0'};
+    if(temp5 == 0)
+    {
+        if(temp4 == 0)
+        {
+            if(temp3 == 0)
+            {
+                if(temp2 == 0)
+                {
+                    text[0] = temp1;
+                    text[1] = '\0';
+                }
+                else
+                {
+                    text[0] = temp2;
+                    text[1] = temp1;
+                    text[2] = '\0';
+                }
+            }
+            else
+            {
+                text[0] = temp3;
+                text[1] = temp2;
+                text[2] = temp1;
+                text[3] = '\0';
+            }
+        }
+        else
+        {
+            text[0] = temp4;
+            text[1] = temp3;
+            text[2] = temp2;
+            text[3] = temp1;
+            text[4] = '\0';
+        }
+    }
+    else
+    {
+        text[0] = temp5;
+        text[1] = temp4;
+        text[2] = temp3;
+        text[3] = temp2;
+        text[4] = temp1;
+        text[5] = '\0';
+    }
+
     writeStringAsync(text);
     
     return ret;
