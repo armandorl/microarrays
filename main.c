@@ -122,7 +122,6 @@ INT16 main(void)
                 /* When buffer A is selected process Buffer B */
                 InitADCSignals(&BufferB);
 
-                /* When buffer B is selected process Buffer A */
                 ProcessADCSamples(&Buffer0_regs[0], 
                                   &Buffer1_regs[0],
                                   &Buffer2_regs[0],

@@ -116,12 +116,12 @@ void ProcessADCSamples(fractcomplex *signal1,
     /* Signal 2 */
     phaseSig2 = getPhaseAndMaxFreqCC(signal2, &peakFrequencyBin2, &phaseSig1);
     printPhaseDiff(peakFrequencyBin2, phaseSig1, phaseSig2);
-    writeStringAsync("/");
+    writeStringAsync("\t");
     
     /* Signal 3 */
     phaseSig3 = getPhaseAndMaxFreqCC(signal3, &peakFrequencyBin3, &phaseSig1);
     printPhaseDiff(peakFrequencyBin3, phaseSig1, phaseSig3);
-    writeStringAsync("/");
+    writeStringAsync("\t");
     
     /* Signal 4 */
     phaseSig4 = getPhaseAndMaxFreqCC(signal4, &peakFrequencyBin4, &phaseSig1);
@@ -214,6 +214,6 @@ static void printPhaseDiff(INT16 freq1, fractional phase1, fractional phase2)
 
     diffPhase = phaseFl2 - phaseFl1;
     writeNumberAsync((INT32)freq1);
-    writeStringAsync(":");
+    writeStringAsync(";");
     writeNumberAsync((INT32)diffPhase);
 }
